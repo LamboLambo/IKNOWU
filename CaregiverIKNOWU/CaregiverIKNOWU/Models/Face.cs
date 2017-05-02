@@ -21,6 +21,12 @@ namespace CaregiverIKNOWU.Models
         [JsonProperty(PropertyName = "imageAddress")]
         public string ImageAddress { get; set; }
 
+        [JsonProperty(PropertyName = "imageToken")]
+        public string ImageToken { get; set; }
+
+        [JsonProperty(PropertyName = "isDefault")]
+        public bool IsDefault { get; set; } = false;
+
         [JsonProperty(PropertyName = "personId")]
         public string PersonId { get; set; }
 
@@ -28,7 +34,7 @@ namespace CaregiverIKNOWU.Models
         public string WarningId { get; set; }
 
         //Tempory Storage
-        public BitmapImage Image { get; set; }
+        public BitmapImage Image { get; set; } = null;
 
 
 
@@ -36,7 +42,7 @@ namespace CaregiverIKNOWU.Models
 
         public Face()
         {
-
+            
         }
 
     }//end face

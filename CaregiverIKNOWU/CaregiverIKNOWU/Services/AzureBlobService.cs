@@ -26,7 +26,7 @@ namespace CaregiverIKNOWU.Services
     "iknowu", "SqJoJfVI0DlaeL0rrsnprGvovrSkzPT03RwVAY7l01YeDImxA7gH4AnvbFTHUFs1qbDmIt389pfrSWgjsh5toQ==");
 
         public static string clientName = "http://iknowu.blob.core.windows.net/";
-        public static string containerName = "imagescontainer";
+        public static string containerName = MainPage.PatientId; 
 
 
         #endregion
@@ -74,11 +74,11 @@ namespace CaregiverIKNOWU.Services
         ///<summary>
         ///Upload an image file from imageToken
         ///</summary>
-        public async static Task UploadImageFromImageToken(string imageToken, string uploadImageName)
+        public async static Task UploadImageFromImageToken(string imageToken, string uploadImageNameWithType)
         {
             //Prepare the blob
             CloudBlobContainer container = await GetContainer();
-            CloudBlockBlob blob = container.GetBlockBlobReference(uploadImageName);
+            CloudBlockBlob blob = container.GetBlockBlobReference(uploadImageNameWithType);
             await blob.DeleteIfExistsAsync();
 
             //Upload Image to Blob
@@ -89,13 +89,6 @@ namespace CaregiverIKNOWU.Services
         }
 
 
-
-
-
-        #endregion
-
-
-        #region Update Methods
 
 
 

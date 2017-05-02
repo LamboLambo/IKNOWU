@@ -28,13 +28,13 @@
     <AppXManifest Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-01T14:33:57.034</Modified>
+      <Modified>2017-05-02T15:37:26.305</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.exe">
       <PackagePath>entrypoint\CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-01T14:33:55.893</Modified>
+      <Modified>2017-05-02T15:37:25.746</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\.nuget\packages\Microsoft.Azure.Mobile.Client\3.1.0\lib\netcore45\Microsoft.WindowsAzure.Mobile.Ext.dll">
       <PackagePath>Microsoft.WindowsAzure.Mobile.Ext.dll</PackagePath>
@@ -652,7 +652,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.xr.xml">
       <PackagePath>CaregiverIKNOWU.xr.xml</PackagePath>
-      <Modified>2017-05-01T14:32:22.115</Modified>
+      <Modified>2017-05-02T11:53:44.437</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
@@ -661,11 +661,11 @@
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-01T14:33:56.698</Modified>
+      <Modified>2017-05-02T12:28:26.524</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\CaregiverIKNOWU.exe">
       <PackagePath>CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-01T14:33:57.029</Modified>
+      <Modified>2017-05-02T15:37:26.300</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

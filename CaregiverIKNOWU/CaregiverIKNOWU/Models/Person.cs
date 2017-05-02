@@ -24,8 +24,18 @@ namespace CaregiverIKNOWU.Models
         [JsonProperty(PropertyName = "isFamiliar")]
         public bool IsFamiliar { get; set; }
 
+        [JsonProperty(PropertyName = "patientId")]
+        public string PatientId { get; set; }
+
+        [JsonProperty(PropertyName = "defaultImageAddress")]
+        public string DefaultImageAddress { get; set; }
+
+        [JsonProperty(PropertyName = "riskFactor")]
+        public int RiskFactor { get; set; }
+
+
         //Tempory Storage
-        public BitmapImage Image { get; set; }
+        public BitmapImage DefaultIcon { get; set; }
 
 
 
