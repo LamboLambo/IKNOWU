@@ -32,6 +32,26 @@ namespace CaregiverIKNOWU.Services
 
         #region Get Methods
 
+        public async static Task<ObservableCollection<Person>> GetPersonList(string patientId)
+        {
+            persons = await personTable.Where(personTable => personTable.PatientId == patientId).ToCollectionAsync();
+            ObservableCollection<Person> personList = new ObservableCollection<Person>();
+            foreach (Person person in persons)
+            {
+                if (person.DefaultImageAddress != null)
+                {
+                    person.DefaultIcon = await AzureBlobService.DisplayImageFile(person.DefaultImageAddress);
+                }
+                else
+                {
+                    person.DefaultIcon = MainPage.nullBitmapImage;
+                }
+
+                personList.Add(person);
+            }
+            return personList;
+        }
+
         public async static Task<Person> GetPersonFromNameAndRelation(string personName, string personRelation, string patientId)
         {
             persons = await personTable

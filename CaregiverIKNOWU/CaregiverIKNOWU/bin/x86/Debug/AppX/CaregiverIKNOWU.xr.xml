@@ -39,8 +39,8 @@
       <RootProperty Name="Width" />
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Margin" />
       <RootProperty Name="Visibility" />
+      <RootProperty Name="Margin" />
       <RootEvent Name="Tapped" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.TextBlock">
@@ -64,24 +64,6 @@
       <RootProperty Name="HorizontalAlignment" />
       <RootProperty Name="Height" />
       <RootProperty Name="Child" />
-    </RootType>
-    <RootType FullName="Windows.UI.Xaml.Controls.Button">
-      <RootProperty Name="Content" />
-      <RootProperty Name="IsEnabled" />
-      <RootProperty Name="Margin" />
-      <RootProperty Name="HorizontalAlignment" />
-      <RootProperty Name="Width" />
-      <RootProperty Name="FontSize" />
-      <RootProperty Name="Visibility" />
-      <RootProperty Name="VerticalAlignment" />
-      <RootProperty Name="Background" />
-      <RootProperty Name="Height" />
-      <RootProperty Name="Name" />
-      <RootProperty Name="BorderThickness" />
-      <RootProperty Name="BorderBrush" />
-      <RootEvent Name="Click" />
-      <RootEvent Name="PointerPressed" />
-      <RootEvent Name="PointerReleased" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.CommandBar">
       <RootProperty Name="Background" />
@@ -130,6 +112,23 @@
       <RootProperty Name="IsOpen" />
       <RootProperty Name="ChildTransitions" />
       <RootProperty Name="Child" />
+    </RootType>
+    <RootType FullName="Windows.UI.Xaml.Controls.Button">
+      <RootProperty Name="Visibility" />
+      <RootProperty Name="Content" />
+      <RootProperty Name="HorizontalAlignment" />
+      <RootProperty Name="Margin" />
+      <RootProperty Name="VerticalAlignment" />
+      <RootProperty Name="Background" />
+      <RootProperty Name="Width" />
+      <RootProperty Name="Height" />
+      <RootProperty Name="IsEnabled" />
+      <RootProperty Name="Name" />
+      <RootProperty Name="BorderThickness" />
+      <RootProperty Name="BorderBrush" />
+      <RootEvent Name="Click" />
+      <RootEvent Name="PointerPressed" />
+      <RootEvent Name="PointerReleased" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Media.Animation.TransitionCollection" />
     <RootType FullName="Windows.UI.Xaml.Media.Animation.PaneThemeTransition">

@@ -28,7 +28,7 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace CaregiverIKNOWU.Converters
+namespace CaregiverIKNOWU.Controls
 {
     /// <summary>
     /// Convert a bitmap image to a brush that we can bind against

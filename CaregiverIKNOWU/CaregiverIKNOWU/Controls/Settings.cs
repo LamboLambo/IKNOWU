@@ -32,7 +32,7 @@ using System.Xml.Linq;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
 
-namespace CaregiverIKNOWU
+namespace CaregiverIKNOWU.Controls
 {
     /// <summary>
     /// Represents the settings for the FamilyNotes app.

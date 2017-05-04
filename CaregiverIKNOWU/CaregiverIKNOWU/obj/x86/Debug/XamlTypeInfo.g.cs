@@ -133,14 +133,14 @@ namespace CaregiverIKNOWU.CaregiverIKNOWU_XamlTypeInfo
         private void InitTypeTables()
         {
             _typeNameTable = new string[5];
-            _typeNameTable[0] = "CaregiverIKNOWU.Converters.BitmapToBrushConverter";
+            _typeNameTable[0] = "CaregiverIKNOWU.Controls.BitmapToBrushConverter";
             _typeNameTable[1] = "Object";
             _typeNameTable[2] = "CaregiverIKNOWU.MainPage";
             _typeNameTable[3] = "Windows.UI.Xaml.Controls.Page";
             _typeNameTable[4] = "Windows.UI.Xaml.Controls.UserControl";
 
             _typeTable = new global::System.Type[5];
-            _typeTable[0] = typeof(global::CaregiverIKNOWU.Converters.BitmapToBrushConverter);
+            _typeTable[0] = typeof(global::CaregiverIKNOWU.Controls.BitmapToBrushConverter);
             _typeTable[1] = typeof(global::System.Object);
             _typeTable[2] = typeof(global::CaregiverIKNOWU.MainPage);
             _typeTable[3] = typeof(global::Windows.UI.Xaml.Controls.Page);
@@ -179,7 +179,7 @@ namespace CaregiverIKNOWU.CaregiverIKNOWU_XamlTypeInfo
             return -1;
         }
 
-        private object Activate_0_BitmapToBrushConverter() { return new global::CaregiverIKNOWU.Converters.BitmapToBrushConverter(); }
+        private object Activate_0_BitmapToBrushConverter() { return new global::CaregiverIKNOWU.Controls.BitmapToBrushConverter(); }
         private object Activate_2_MainPage() { return new global::CaregiverIKNOWU.MainPage(); }
 
         private global::Windows.UI.Xaml.Markup.IXamlType CreateXamlType(int typeIndex)
@@ -192,7 +192,7 @@ namespace CaregiverIKNOWU.CaregiverIKNOWU_XamlTypeInfo
             switch (typeIndex)
             {
 
-            case 0:   //  CaregiverIKNOWU.Converters.BitmapToBrushConverter
+            case 0:   //  CaregiverIKNOWU.Controls.BitmapToBrushConverter
                 userType = new global::CaregiverIKNOWU.CaregiverIKNOWU_XamlTypeInfo.XamlUserType(this, typeName, type, GetXamlTypeByName("Object"));
                 userType.Activator = Activate_0_BitmapToBrushConverter;
                 userType.SetIsLocalType();

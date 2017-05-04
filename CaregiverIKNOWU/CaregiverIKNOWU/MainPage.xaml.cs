@@ -12,15 +12,15 @@ using Windows.UI.Xaml.Data;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
-
-using CaregiverIKNOWU.Models;
-using CaregiverIKNOWU.Services;
 using System.Collections.ObjectModel;
 using Windows.Storage.Pickers;
 using Windows.Storage;
 using Windows.UI.Xaml.Media.Imaging;
 using Windows.Storage.Streams;
 using Windows.Media.Capture;
+using CaregiverIKNOWU.Controls;
+using CaregiverIKNOWU.Models;
+using CaregiverIKNOWU.Services;
 
 namespace CaregiverIKNOWU
 {
@@ -33,7 +33,7 @@ namespace CaregiverIKNOWU
         ContentDialog progressDialog;
 
         //Materials
-        BitmapImage nullBitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"));
+        public static BitmapImage nullBitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"));
 
         //User Attributes
         string PatientName = "John";
@@ -46,12 +46,6 @@ namespace CaregiverIKNOWU
         Face thisFace;  
         private ObservableCollection<Face> addFaceList;
         private ObservableCollection<Face> deleteFaceList;
-
-
-
-
-
-
 
 
         public MainPage()
@@ -72,7 +66,7 @@ namespace CaregiverIKNOWU
 
             //Initialize the UI
             PersonDialog.Visibility = Visibility.Visible;
-            clearWarningStatus();
+            initializePersonInfoDialog();
 
 
             //Test the Internet Connection
@@ -96,12 +90,24 @@ namespace CaregiverIKNOWU
             //Test Internet Connection
             try
             {
-                var testInternetConnection = await AzureDatabaseService.isPersonTableEmpty(PatientId);
+                //showProgressDialog("Checking the Internet Connection...");
+                //progressDialog.Title = "Processing: ";
+                //progressDialog.PrimaryButtonText = "Ok";
+                statusTextBlock.Text = "Checking the Internet Connection...";
+                Persons.Clear();
+                ObservableCollection<Person> persons = await AzureDatabaseService.GetPersonList(PatientId);
+                foreach (Person person in persons)
+                {
+                    Persons.Add(person);
+                }
+
+                //var testInternetConnection = await AzureDatabaseService.GetPersonList(PatientId);
+                //var testInternetConnection = await AzureDatabaseService.isPersonTableEmpty(PatientId);
             }
             catch (System.Net.Http.HttpRequestException)
             {
                 internetConnection = false;
-
+                statusTextBlock.Text = " ";
                 showProgressDialog("Internet Connection Error! Please check your Internet connection.");
                 progressDialog.Title = "Internet Connection Error!";
                 progressDialog.PrimaryButtonText = "Ok, I know";
@@ -114,10 +120,12 @@ namespace CaregiverIKNOWU
             }
 
             internetConnection = true;
+            statusTextBlock.Text = "Internet Connection Success!";
+            //progressDialog.Content = "Internet Connection Success!";
+            //progressDialog.IsPrimaryButtonEnabled = true;
             return;
 
         }
-
 
         private void initializePersonInfoDialog()
         {
@@ -132,23 +140,25 @@ namespace CaregiverIKNOWU
             PersonRelationInput.Text = "";
             defaultImage.Source = nullBitmapImage;
             FaceImagePreview.Source = nullBitmapImage;
+            deleteFaceButton.IsEnabled = false;
+            SetDefaultButton.IsEnabled = false;
+
+            //Risk
+            clearWarningStatus();
 
             //Data
             Faces.Clear();
         }
 
-        /// <summary>
-        /// Clear Warning Status
-        /// </summary>
         private void clearWarningStatus()
         {
             WarningImage.Visibility = Visibility.Collapsed;
 
             //Dialog Appearance
             RiskGrid.Visibility = Visibility.Collapsed;
+            riskSlider.Value = 0;
+            sendWarningTextBlock.Text = "";
             VideoStackPanel.Visibility = Visibility.Collapsed;
-
-            initializePersonInfoDialog();
         }
 
         private async void createWarningInfo(Person person)
@@ -182,7 +192,15 @@ namespace CaregiverIKNOWU
             await progressDialog.ShowAsync();
         }
 
-
+        private async void loadPersons()
+        {
+            Persons.Clear();
+            ObservableCollection<Person> persons = await AzureDatabaseService.GetPersonList(PatientId);
+            foreach (Person person in persons)
+            {
+                Persons.Add(person);
+            }
+        }
 
 
 
@@ -207,6 +225,68 @@ namespace CaregiverIKNOWU
         #endregion
 
         #region Actions Outside
+
+        private async void personGridView_ItemClick(object sender, ItemClickEventArgs e)
+        {
+            //Update Person Info
+            thisPerson = e.ClickedItem as Person;
+            familiarRadioButton.IsChecked = thisPerson.IsFamiliar;
+            strangeRadioButton.IsChecked = !thisPerson.IsFamiliar;
+            PersonNameInput.Text = thisPerson.Name;
+            PersonRelationInput.Text = thisPerson.Relation;
+            if (thisPerson.DefaultImageAddress != null)
+            {
+                defaultImage.Source = thisPerson.DefaultIcon; //await AzureBlobService.DisplayImageFile(thisPerson.DefaultImageAddress);
+            }
+            else
+            {
+                defaultImage.Source = nullBitmapImage;
+            }
+            riskSlider.Value = thisPerson.RiskFactor;
+
+            //Update Faces
+            Faces.Clear();
+            ObservableCollection<Face> faces = await AzureDatabaseService.GetFaceList(thisPerson.Id);
+            foreach (Face face in faces)
+            {
+                face.Image = await AzureBlobService.DisplayImageFile(face.ImageAddress);
+                Faces.Add(face);
+            }
+
+            //Show the Person Info Dialog
+            var result = await PersonDialog.ShowAsync();
+
+            // Value 1 indicates primary button was selected by the user, which adds a new Person
+            if ((int)result == 1)
+            {
+                //TODO: Enable the Update of Person Info
+
+
+
+            }//end result == 1
+
+            initializePersonInfoDialog();
+
+        }
+
+        private void personGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            if (e.AddedItems != null && e.AddedItems.Any())
+            {
+                GridViewItem gridViewFaceItem = personGridView.ContainerFromItem(e.AddedItems[0]) as GridViewItem;
+                gridViewFaceItem.Background = new SolidColorBrush(Windows.UI.Colors.Black);
+                gridViewFaceItem.Background.Opacity = 0.40;
+            }
+
+            if (e.RemovedItems != null && e.RemovedItems.Any())
+            {
+                GridViewItem gridViewFaceItem = personGridView.ContainerFromItem(e.RemovedItems[0]) as GridViewItem;
+                gridViewFaceItem.Background = new SolidColorBrush(Windows.UI.Colors.Transparent);
+            }
+
+        }
+
+
         private void addPersonButton_PointerPressed(object sender, PointerRoutedEventArgs e)
         {
             //addPersonButton_imageBrush.Opacity = 100;
@@ -221,13 +301,6 @@ namespace CaregiverIKNOWU
         private void addPersonButton_PointerReleased(object sender, PointerRoutedEventArgs e)
         {
             //addPersonButton_imageBrush.Opacity = 75;
-        }
-
-        private async void updateInfoButton_Click(object sender, RoutedEventArgs e)
-        {
-            await PersonDialog.ShowAsync();
-
-
         }
 
         private async void addPersonButton_Click(object sender, RoutedEventArgs e)
@@ -268,6 +341,9 @@ namespace CaregiverIKNOWU
                         await AzureDatabaseService.DeleteFace(face);
                     }
 
+                    //Reload Persons List
+                    loadPersons();
+
                     //Add a Person Finished!
                     progressDialog.Content = "Add a Person Finished !";
                     progressDialog.IsPrimaryButtonEnabled = true;
@@ -276,9 +352,7 @@ namespace CaregiverIKNOWU
 
             }//end internetConnection
 
-
-
-
+            initializePersonInfoDialog();
 
         }//end addPersonButton_Click
 
@@ -292,13 +366,15 @@ namespace CaregiverIKNOWU
             var result = await PersonDialog.ShowAsync();
 
 
-            
+            initializePersonInfoDialog();
         }
 
         #endregion
 
 
         #region Actions Inside the Dialog
+
+        // Basic Info Grid
 
         private void FamiliarRadioButton_Checked(object sender, RoutedEventArgs e)
         {
@@ -321,8 +397,24 @@ namespace CaregiverIKNOWU
             }
         }
 
+
+        //Risk Grid
+
+        private void riskSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
+        {
+            thisPerson.RiskFactor = (int)riskSlider.Value;
+        }
+
+        private void sendWarningButton_Click(object sender, RoutedEventArgs e)
+        {
+            //TODO: Send Warning Message
+        }
+
+        //Face View Grid
+
         private void faceGridView_ItemClick(object sender, ItemClickEventArgs e)
         {
+            deleteFaceButton.IsEnabled = true;
             thisFace = e.ClickedItem as Face;
             FaceImagePreview.Source = thisFace.Image;
         }
@@ -354,12 +446,6 @@ namespace CaregiverIKNOWU
                 gridViewFaceItem.Background = new SolidColorBrush(Windows.UI.Colors.Transparent);
             }
 
-        }
-
-
-        private void riskSlider_ValueChanged(object sender, RangeBaseValueChangedEventArgs e)
-        {
-            thisPerson.RiskFactor = (int)riskSlider.Value;
         }
 
         private async void AddNewFaceFromCamera_Click(object sender, RoutedEventArgs e)
@@ -454,6 +540,9 @@ namespace CaregiverIKNOWU
 
         }
 
+
+        //Image Preview Grid
+
         private void deleteFaceButton_Click(object sender, RoutedEventArgs e)
         {
             Faces.Remove(thisFace);
@@ -502,9 +591,12 @@ namespace CaregiverIKNOWU
             SetDefaultButton.IsEnabled = false;
         }
 
+
+        //Video StackPanel
+
         private void CameraStreamingButton_Click(object sender, RoutedEventArgs e)
         {
-
+            //TODO: Watch Real-Time Video
         }
 
 
@@ -528,12 +620,20 @@ namespace CaregiverIKNOWU
         private async void testButton_Click(object sender, RoutedEventArgs e)
         {
 
+            //statusTextBlock.Text = "Person.Count = " + Persons.Count.ToString();
 
-
-
-
+            //if (Persons.Count == 1)
+            //{
+            //    statusTextBlock.Text += ", " + "Name = " + Persons[0].Name;
+            //    statusTextBlock.Text += ", " + "Relation = " + Persons[0].Relation;
+            //    testImage.Source = Persons[0].DefaultIcon;
+            //}
+            
 
 
         }
+
+
+
     }//end class
 }

@@ -150,6 +150,7 @@ C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\System.Xml.XmlSerializer.dll
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Microsoft.WindowsAzure.Storage.dll
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Microsoft.WindowsAzure.Storage.pdb
+C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\CaregiverIKNOWU.csprojResolveAssemblyReference.cache
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\App.g.i.cs
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\App.g.cs
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\MainPage.g.i.cs
@@ -234,4 +235,3 @@ C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\MultipleQualifiersPerDimensionFound.txt
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\Microsoft.WindowsAzure.Mobile.Ext.pri.xml
 C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\ProjectArchitectures.txt
-C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\obj\x86\Debug\CaregiverIKNOWU.csprojResolveAssemblyReference.cache

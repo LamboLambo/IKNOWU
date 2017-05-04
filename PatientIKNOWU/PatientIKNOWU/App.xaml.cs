@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Microsoft.WindowsAzure.MobileServices;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -107,6 +108,8 @@ namespace PatientIKNOWU
 
 
 
+        public static MobileServiceClient MobileService = new MobileServiceClient(
+"https://iknowu.azurewebsites.net");
 
 
 

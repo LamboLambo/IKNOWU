@@ -2,7 +2,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace CaregiverIKNOWU
+namespace CaregiverIKNOWU.Controls
 {
     /// <summary>
     /// Provides change-notification for classes that derive from it.

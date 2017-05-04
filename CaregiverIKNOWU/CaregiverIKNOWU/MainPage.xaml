@@ -4,7 +4,7 @@
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:CaregiverIKNOWU"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
-    xmlns:converter="using:CaregiverIKNOWU.Converters"
+    xmlns:converter="using:CaregiverIKNOWU.Controls"
     xmlns:data="using:CaregiverIKNOWU.Models"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d" Opacity="0.8">
@@ -14,16 +14,16 @@
 
         <DataTemplate x:Key="PersonItemTemplate" x:DataType="data:Person">
             <StackPanel x:Name="Grid_item" CanDrag="false" Orientation="Vertical" Margin="5" Width="160" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center">
-                <Image Source="{x:Bind DefaultIcon}" Height="140" Width="140" HorizontalAlignment="Center"/>
+                <Image Source="{x:Bind DefaultIcon}" Height="170" Width="170" HorizontalAlignment="Center"/>
                 <Viewbox HorizontalAlignment="Stretch" Height="30">
                     <TextBlock Text="{x:Bind Name}" FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
                 </Viewbox>
                 <Viewbox HorizontalAlignment="Stretch" Height="30">
                     <TextBlock Text="{x:Bind Relation}" FontWeight="Normal" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
                 </Viewbox>
-                <Viewbox HorizontalAlignment="Stretch" Height="25">
+                <!--<Viewbox HorizontalAlignment="Stretch" Height="30">
                     <Button x:Name="updateInfoButton" Content="Update" IsEnabled="True"  Margin="0,0,0,0" HorizontalAlignment="Center" Width="200" FontSize="30" Click="updateInfoButton_Click" />
-                </Viewbox>
+                </Viewbox>-->
             </StackPanel>
         </DataTemplate>
 
@@ -39,21 +39,12 @@
     <Page.BottomAppBar>
         <CommandBar Background="#CCE6E6E6" Content="Patient Name: &#xD;&#xA;     John">
             <CommandBar.PrimaryCommands>
-
-
-                <!--<AppBarButton 
-                    x:Name="Tidy"
-                    Icon="AlignCenter"
-                    Label="Tidy notes"
-                    Tapped="TidyNotes" />-->
-
                 <AppBarButton 
                     x:Name="Add"
                     Icon="AddFriend"
-                    Label="Add New Patient"
-                     />
+                    Label="Add New Patient"/>
                 <!--Tapped="AddPatientTapped"-->
-
+                
                 <!--<AppBarButton 
                     x:Name="FaceDetectionButton"
                     Tapped="FaceDetectionButton_Tapped" 
@@ -75,21 +66,19 @@
                 <AppBarButton
                     x:Name="SettingsButton"
                     Icon="Setting"
-                    Label="Settings" Tapped="SettingsButton_Tapped"
-                     />
-                <!--Tapped="SettingsButton_Tapped"-->
-
+                    Label="Settings" 
+                    Tapped="SettingsButton_Tapped"/>
             </CommandBar.PrimaryCommands>
         </CommandBar>
     </Page.BottomAppBar>
 
 
-    <Grid>
+    <Grid x:Name="rootGrid">
         <Grid.Background>
             <ImageBrush ImageSource="Assets/Brushed_metal_texture.jpg"/>
         </Grid.Background>
         <Grid 
-            x:Name="rootGrid"
+            x:Name="backgroundGrid"
             Width="Auto"
             Height="Auto"
             Background="{x:Bind AppSettings.WallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}" >
@@ -110,14 +99,18 @@
                 </Grid.ColumnDefinitions>
                 <TextBlock Text="Person Database: " FontWeight="SemiBold" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" Margin="10,10,0,5" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center"/>
                 <TextBlock x:Name="statusTextBlock" Text=" " FontWeight="Normal" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" Margin="0,5,10,5" FontSize="15" HorizontalAlignment="Right"  VerticalAlignment="Center" Foreground="#FFFF2B2B"/>
-                <GridView x:Name="personGridView" Margin="10,5.4,10.2,9.2"  Grid.Column="0" Grid.Row="1"
+                <GridView x:Name="personGridView" Margin="10,5,10,10"  Grid.Column="0" Grid.Row="1"
                           ItemsSource="{x:Bind Persons}"
                           ItemTemplate="{StaticResource PersonItemTemplate}" BorderBrush="#FF494949" BorderThickness="1,1,1,1"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Enabled"
                           ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollMode="Disabled"
                           CanDragItems="False" 
-                          IsItemClickEnabled="True"
-                          />
+                          IsItemClickEnabled="True" ItemClick="personGridView_ItemClick" SelectionChanged="personGridView_SelectionChanged"
+                          >
+                    <GridView.Background>
+                        <SolidColorBrush Color="Gray" Opacity="0"/>
+                    </GridView.Background>
+                </GridView>
                 <Button x:Name="addPersonButton" IsEnabled="True" Grid.Row="1" Margin="9.8,10.4,10,10.2" HorizontalAlignment="Stretch" Grid.Column="1" VerticalAlignment="Stretch" PointerPressed="addPersonButton_PointerPressed" PointerReleased="addPersonButton_PointerReleased" Click="addPersonButton_Click" >
                     <Button.Background>
                         <ImageBrush x:Name="addPersonButton_imageBrush" Stretch="Uniform" ImageSource="Assets/Add_person.png" Opacity="0.9"/>
@@ -156,7 +149,7 @@
             <ScrollViewer VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto">
                 <StackPanel x:Name="PersonDialogPanel" BorderBrush="#FFFB2323" BorderThickness="3">
                     <TextBlock Text="Personal Icon and Basic Infomation: " TextAlignment="Center"/>
-                    <Grid x:Name="MainImageGrid" Margin="0,0,0,0" Height="150">
+                    <Grid x:Name="BasicInfoGrid" Margin="0,0,0,0" Height="150">
                         <Grid.RowDefinitions>
                             <RowDefinition Height="1*"/>
                             <RowDefinition Height="1*"/>
@@ -181,7 +174,7 @@
                             <ColumnDefinition Width="1*"/>
                         </Grid.ColumnDefinitions>
                         <Slider x:Name="riskSlider" Header="Risk Factor Estimate" Width="200" ValueChanged="riskSlider_ValueChanged" Margin="10,5,10,5" Grid.Column="0" HorizontalAlignment="Right" Maximum="5" LargeChange="1"/>
-                        <Button  x:Name="sendWarningButton" Content="Send a Warning Message" Width="200" Grid.Column="1" HorizontalAlignment="Center" Margin="10,5,10,5"/>
+                        <Button  x:Name="sendWarningButton" Content="Send a Warning Message" Width="200" Grid.Column="1" HorizontalAlignment="Center" Margin="10,5,10,5" Click="sendWarningButton_Click"/>
                         <TextBlock x:Name="sendWarningTextBlock" Text=""  TextAlignment="Center" Grid.Column="2" VerticalAlignment="Center" HorizontalAlignment="Left" Margin="10,5,10,5" Foreground="#FFFD2B2B"/>
                     </Grid>
                     <TextBlock Text="Face Database: "  TextAlignment="Center"/>
@@ -221,9 +214,9 @@
                     <Grid x:Name="ImagePreviewGrid" Height="200">
                         <Image x:Name="FaceImagePreview" Source="Assets/Square150x150Logo.scale-200.png"
                            Margin="5,5,5,5" VerticalAlignment="Center" HorizontalAlignment="Center" />
-                        <Button x:Name="deleteFaceButton" Content="Delete This Face" HorizontalAlignment="Right" Margin="0,0,10,0" Click="deleteFaceButton_Click"/>
+                        <Button x:Name="deleteFaceButton" IsEnabled="False" Content="Delete This Face" HorizontalAlignment="Right" Margin="0,0,10,0" Click="deleteFaceButton_Click"/>
                     </Grid>
-                    <Button x:Name="SetDefaultButton" Content="Set this Face as the Default Icon" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SetDefaultButton_Click"/>
+                    <Button x:Name="SetDefaultButton" IsEnabled="False" Content="Set this Face as the Default Icon" VerticalAlignment="Center" HorizontalAlignment="Center" Click="SetDefaultButton_Click"/>
                     <StackPanel x:Name="VideoStackPanel" Visibility="Collapsed">
                         <TextBlock />
                         <Button Name="CameraStreamingButton" Content="Watch Real-Time Video"  Click="CameraStreamingButton_Click" VerticalAlignment="Center" HorizontalAlignment="Center"/>
@@ -279,7 +272,8 @@
             </Border>
         </Popup>
 
-        <Button x:Name="testButton" Visibility="Collapsed" Content="Test Button&#xD;&#xA;ddd" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Background="#FFF34A4A" Width="155" Height="77" Click="testButton_Click"/>
+        <Button x:Name="testButton" Visibility="Collapsed"   Content="Test Button&#xD;&#xA;ddd" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Background="#FFF34A4A" Width="155" Height="77" Click="testButton_Click"/>
+        <Image x:Name="testImage" Source="Assets/Square150x150Logo.scale-200.png" Visibility="Collapsed"   HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top"  Width="155" Height="77" />
 
 
 
