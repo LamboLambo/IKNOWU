@@ -87,6 +87,10 @@ namespace PatientIKNOWU
             await CleanupCameraAsync();
         }
 
+        /// <summary>
+        /// Start Preview 
+        /// </summary>
+        /// <returns></returns>
         private async Task StartPreviewAsync()
         {
             try
@@ -118,6 +122,10 @@ namespace PatientIKNOWU
 
         }
 
+        /// <summary>
+        /// Stop, Dispose and Cleanup Camera
+        /// </summary>
+        /// <returns></returns>
         private async Task CleanupCameraAsync()
         {
             if (_mediaCapture != null)
