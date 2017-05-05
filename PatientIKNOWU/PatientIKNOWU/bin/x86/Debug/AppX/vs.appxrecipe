@@ -16,7 +16,7 @@
     <PackageRegistrationPath>
     </PackageRegistrationPath>
     <RemoveNonLayoutFiles>true</RemoveNonLayoutFiles>
-    <RegisteredManifestChecksum>22DE42BF64E611F5EBFBF3AEF284C0503137B67B4FD1D7397F73B7E47C24C298</RegisteredManifestChecksum>
+    <RegisteredManifestChecksum>670B3AE3CD02F18EC76708BF1B32742DF05BF7F997BA6D89C0C2330150551F5C</RegisteredManifestChecksum>
     <RegisteredPackageMoniker>e3d20f12-2de9-46b5-a6b6-e57c83981789_1.0.0.0_x86__cyanyqm0ktqz2</RegisteredPackageMoniker>
     <RegisteredUserModeAppID>e3d20f12-2de9-46b5-a6b6-e57c83981789_cyanyqm0ktqz2!App</RegisteredUserModeAppID>
     <RegisteredPackageID>e3d20f12-2de9-46b5-a6b6-e57c83981789</RegisteredPackageID>
@@ -28,13 +28,13 @@
     <AppXManifest Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\PatientIKNOWU\PatientIKNOWU\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-03T14:46:21.228</Modified>
+      <Modified>2017-05-05T01:49:53.184</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\PatientIKNOWU\PatientIKNOWU\bin\x86\Debug\PatientIKNOWU.exe">
       <PackagePath>entrypoint\PatientIKNOWU.exe</PackagePath>
-      <Modified>2017-05-03T14:46:19.144</Modified>
+      <Modified>2017-05-05T01:49:50.782</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\.nuget\packages\Microsoft.Azure.Mobile.Client\3.1.0\lib\netcore45\Microsoft.WindowsAzure.Mobile.Ext.dll">
       <PackagePath>Microsoft.WindowsAzure.Mobile.Ext.dll</PackagePath>
@@ -648,7 +648,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\PatientIKNOWU\PatientIKNOWU\bin\x86\Debug\PatientIKNOWU.xr.xml">
       <PackagePath>PatientIKNOWU.xr.xml</PackagePath>
-      <Modified>2017-05-03T14:46:18.562</Modified>
+      <Modified>2017-05-04T12:55:00.851</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
@@ -657,11 +657,11 @@
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\PatientIKNOWU\PatientIKNOWU\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-03T14:46:20.679</Modified>
+      <Modified>2017-05-05T01:10:02.641</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\PatientIKNOWU\PatientIKNOWU\bin\x86\Debug\Core\PatientIKNOWU.exe">
       <PackagePath>PatientIKNOWU.exe</PackagePath>
-      <Modified>2017-05-03T14:46:21.218</Modified>
+      <Modified>2017-05-05T01:49:53.161</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>
