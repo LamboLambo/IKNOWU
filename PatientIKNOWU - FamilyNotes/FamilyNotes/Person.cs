@@ -35,6 +35,39 @@ namespace FamilyNotes
     public class Person : BindableBase
     {
 
+        [JsonProperty(PropertyName = "id")]
+        public string Id { get; set; } = "";
+
+        [JsonProperty(PropertyName = "name")]
+        public string Name { get; set; } = "";
+
+        [JsonProperty(PropertyName = "relation")]
+        public string Relation { get; set; } = "";
+
+        [JsonProperty(PropertyName = "isFamiliar")]
+        public bool IsFamiliar { get; set; }
+
+        [JsonProperty(PropertyName = "patientId")]
+        public string PatientId { get; set; } = "";
+
+        [JsonProperty(PropertyName = "defaultImageAddress")]
+        public string DefaultImageAddress { get; set; } = "";
+
+        [JsonProperty(PropertyName = "riskFactor")]
+        public int RiskFactor { get; set; }
+
+        [JsonProperty(PropertyName = "updatedAt")]
+        public string UpdatedAt { get; set; }
+
+
+        //Tempory Storage
+        public BitmapImage DefaultIcon { get; set; }
+
+
+
+
+
+
         /// <summary>
         ///  Create a person
         /// </summary>
@@ -82,7 +115,7 @@ namespace FamilyNotes
             }
         }
 
-        private string _imageFileName;
+        private string _imageFileName = "";
 
 
         public Person()
@@ -91,30 +124,6 @@ namespace FamilyNotes
         }
 
 
-        [JsonProperty(PropertyName = "id")]
-        public string Id { get; set; }
-
-        [JsonProperty(PropertyName = "name")]
-        public string Name { get; set; }
-
-        [JsonProperty(PropertyName = "relation")]
-        public string Relation { get; set; }
-
-        [JsonProperty(PropertyName = "isFamiliar")]
-        public bool IsFamiliar { get; set; }
-
-        [JsonProperty(PropertyName = "patientId")]
-        public string PatientId { get; set; }
-
-        [JsonProperty(PropertyName = "defaultImageAddress")]
-        public string DefaultImageAddress { get; set; }
-
-        [JsonProperty(PropertyName = "riskFactor")]
-        public int RiskFactor { get; set; }
-
-
-        //Tempory Storage
-        public BitmapImage DefaultIcon { get; set; }
 
 
 

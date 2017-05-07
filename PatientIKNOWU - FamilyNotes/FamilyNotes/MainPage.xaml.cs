@@ -70,7 +70,7 @@ namespace FamilyNotes
         Person thisPerson;
         private ObservableCollection<ObservableCollection<Face>> Faces;
         Face thisFace;
-        string thisPhrase;
+        public static string thisPhrase = "";
 
         public static bool isInformed = false;
 
@@ -142,6 +142,13 @@ namespace FamilyNotes
                 Persons.Clear();
                 ObservableCollection<Person> persons = await AzureDatabaseService.GetPersonList(PatientId);
                 //statusTextBlock.Text = persons.Count + " Persons: ";
+
+                //Clear Local User Folder
+                StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\"), CreationCollisionOption.OpenIfExists);
+                await userFolder.DeleteAsync();
+
+
+                //Download each person
                 foreach (Person person in persons)
                 {
                     //Update Info
@@ -182,7 +189,7 @@ namespace FamilyNotes
 
             internetConnection = true;
             //statusTextBlock.Text = "Internet Connection Success!";
-            progressDialog.Content = "Finished!";
+            progressDialog.Content = "Success!";
             progressDialog.IsPrimaryButtonEnabled = true;
             return;
 
@@ -350,56 +357,71 @@ namespace FamilyNotes
             //    now.Hour < 12 ? "Good morning" :
             //    now.Hour < 18 ? "Good afternoon" :
             //    /* otherwise */ "Good night";
-            string name = person.Name;
+
             //var thisName = (string.IsNullOrEmpty(name) || name == App.EVERYONE) ? "!" : $", {name}!";
             //TextGreeting.Text = $"{greeting}{person}";
 
-            if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE) && isInformed == false)
+            string name = person.Name;
+
+            if (!name.Contains("stranger"))
             {
-                await _speechManager.SpeakAsync("This is " + name, this._media);
+                //This is a Familiar Person
 
-                //await speech("This is " + name);
+                thisPhrase = "This is: " + name + "!";
 
-                if (person.Relation != "")
+                if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE) && isInformed == false)
                 {
-                    string relation = "Your " + person.Relation;
-                    
-                    await _speechManager.SpeakAsync(" your " + person.Relation, this._media);
+                    await _speechManager.SpeakAsync("This is: " + name + "!", this._media);
+
+                    //await speech("This is " + name);
+
+                    if (person.Relation != "")
+                    {
+                        thisPhrase += " Your " + person.Relation + "!";
+                        await _speechManager.SpeakAsync("Your " + person.Relation + "!", this._media);
+                    }
+
+                    if (person.IsFamiliar == false)
+                    {
+                        thisPhrase += " Stranger! Be careful!";
+                        await _speechManager.SpeakAsync("Stranger! Be careful!", this._media);
+                    }
+
+                    if (person.RiskFactor > 0)
+                    {
+                        thisPhrase += " Warning! Keep a distance!";
+                        await _speechManager.SpeakAsync("Warning! Keep a distance!", this._media);
+                    }
+
+
+
+                    //isInformed = true;
+
+                    //await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                    //{
+
+                    //    var SpeakGreeting = $"{greeting} {name}";
+
+                    //    //var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
+
+                    //    //if (notes > 0)
+                    //    //{
+                    //    //    if (notes == 1)
+                    //    //        SpeakGreeting += ",there is a note for you.";
+                    //    //    else
+                    //    //        SpeakGreeting += $",there are {notes} notes for you.";
+                    //    //}
+
+                    //    await this._speechManager.SpeakAsync(
+                    //        SpeakGreeting,
+                    //         this._media);
+                    //});
                 }
+            }
+            else{
+                //This is a stranger
+                await _speechManager.SpeakAsync("This is a stranger!", this._media);
 
-                if (person.IsFamiliar == false)
-                {
-                    await _speechManager.SpeakAsync("Stranger! Be careful!", this._media);
-                }
-
-                if (person.RiskFactor > 0)
-                {
-                    await _speechManager.SpeakAsync("Warning! Keep a distance!", this._media);
-                }
-
-
-
-                //isInformed = true;
-
-                //await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                //{
-
-                //    var SpeakGreeting = $"{greeting} {name}";
-
-                //    //var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
-
-                //    //if (notes > 0)
-                //    //{
-                //    //    if (notes == 1)
-                //    //        SpeakGreeting += ",there is a note for you.";
-                //    //    else
-                //    //        SpeakGreeting += $",there are {notes} notes for you.";
-                //    //}
-
-                //    await this._speechManager.SpeakAsync(
-                //        SpeakGreeting,
-                //         this._media);
-                //});
             }
         }
 
@@ -417,10 +439,9 @@ namespace FamilyNotes
             return focusedNote;
         }
 
-        private void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
+        private async void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
         {
             //this.Public_ShowNotesForPerson(e.User);
-            
 
             string thisName = e.User;
 
@@ -429,18 +450,10 @@ namespace FamilyNotes
                 if (person.Name == thisName)
                 {
                     thisPerson = person;
+                    UpdateGreeting(thisPerson);
                     break;
                 }
             }
-
-            UpdateGreeting(thisPerson);
-
-
-
-
-
-
-
 
         }
 
@@ -1053,10 +1066,28 @@ namespace FamilyNotes
             testInternetConnection();
         }
 
-        private void button_Click(object sender, RoutedEventArgs e)
+        private async void button_Click(object sender, RoutedEventArgs e)
         {
-            speech("完美");
+            captureImage.Source = UserPresence.thisFace.Image;
+
+            await speech("完美");
         }
+
+        private async void userButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (thisPhrase != "")
+            {
+                await _speechManager.SpeakAsync(thisPhrase, this._media);
+            }
+        }
+
+
+
+
+
+
+
+
     }//end class
 
 }

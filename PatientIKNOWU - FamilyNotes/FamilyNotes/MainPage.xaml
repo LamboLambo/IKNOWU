@@ -355,9 +355,8 @@ THE SOFTWARE.
 
         <Grid x:Name="PatientIKNOWU_Grid">
 
-
-
-            <Grid x:Name="webcamGrid" Width="Auto" Height="Auto">
+            <Grid x:Name="testingGrid" Width="Auto" Height="Auto">
+                <!--For Testing-->
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="Auto"/>
@@ -365,7 +364,7 @@ THE SOFTWARE.
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <Grid HorizontalAlignment="Stretch" Visibility="Visible"  VerticalAlignment="Stretch" Grid.Row="1"  >
+                <Grid HorizontalAlignment="Stretch" Visibility="Visible"  VerticalAlignment="Stretch" Grid.Row="1" Margin="0,0,0,112.4" Grid.RowSpan="3"  >
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition/>
                         <ColumnDefinition/>
@@ -381,10 +380,9 @@ THE SOFTWARE.
 
                     <CaptureElement Name="CamPreview" Visibility="Visible" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Stretch="Uniform" Margin="10" />
                     <Canvas Name="VisualizationCanvas" Visibility="Visible" Grid.Row="1" Grid.Column="0" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Margin="10" Width="{Binding ActualWith, ElementName=CamPreview}" Height="{Binding ActualHeight, ElementName=CamPreview}" />
-                    <Image x:Name="captureImage" Visibility="Visible"  Grid.Row="1" Grid.Column="1" Margin="10, 10, 10, 10" />
                 </Grid>
 
-                <Button x:Name="button" Visibility="Collapsed"  Grid.Row="0" Content="Button" HorizontalAlignment="Left" Margin="278,12,0,8" VerticalAlignment="Stretch" Click="button_Click"/>
+                <Button x:Name="button" Visibility="Visible" Grid.Row="0" Content="Button" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Click="button_Click" Width="233" Height="177"/>
 
                 <Grid x:Name="textStatus_Grid" Grid.Row="3" Margin="0,0,0,360">
                     <Grid.RowDefinitions>
@@ -411,16 +409,18 @@ THE SOFTWARE.
                     Text="Face detection is enabled. Images are being captured and used for identity verification."
                     Visibility="Collapsed"
                     IsReadOnly="True"/>
-                    
+
                     <TextBlock x:Name="statusTextBlock" Visibility="Visible" Text=" " Grid.Row="2" Margin="10, 10, 10, 10" />
                 </Grid>
 
+                <Image x:Name="captureImage" Visibility="Visible"  Grid.Row="0"  Margin="10, 10, 10, 10" Width="300" Height="300" />
 
 
             </Grid>
 
 
 
+            <Button x:Name="userButton" Visibility="Visible" Content="Listen Again" HorizontalAlignment="Center"  Margin="10" VerticalAlignment="Center"  Click="userButton_Click" Width="600" Height="400"/>
 
 
 

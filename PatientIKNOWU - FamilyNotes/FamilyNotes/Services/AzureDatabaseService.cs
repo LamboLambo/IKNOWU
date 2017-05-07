@@ -37,7 +37,7 @@ namespace FamilyNotes.Services
             ObservableCollection<Person> personList = new ObservableCollection<Person>();
             foreach (Person person in persons)
             {
-                if (person.DefaultImageAddress != null)
+                if (person.DefaultImageAddress != null && person.DefaultImageAddress != "")
                 {
                     person.DefaultIcon = await AzureBlobService.DisplayImageFile(person.DefaultImageAddress);
                 }
@@ -68,6 +68,15 @@ namespace FamilyNotes.Services
             }
         }
 
+        public async static Task<Person> GetLatestPerson()
+        {
+            persons = await personTable
+                .OrderByDescending(personTable => personTable.UpdatedAt).ToCollectionAsync();
+            return persons[0];
+        }
+
+
+
         public async static Task<ObservableCollection<Face>> GetFaceList(string personId)
         {
             faces = await faceTable.Where(faceTable => faceTable.PersonId == personId).ToCollectionAsync();
@@ -84,6 +93,12 @@ namespace FamilyNotes.Services
             return faces[0];
         }
 
+        public async static Task<Face> GetLatestFace()
+        {
+            faces = await faceTable
+                .OrderByDescending(faceTable => faceTable.UpdatedAt).ToCollectionAsync();
+            return faces[0];
+        }
 
 
         #endregion
@@ -115,31 +130,49 @@ namespace FamilyNotes.Services
             }
         }
 
+        public async static Task UploadPersonInfoByJoWithId(Person person)
+        {
+            JObject jo = new JObject();
+            jo.Add("id", person.Id);
+            jo.Add("name", person.Name);
+            jo.Add("relation", person.Relation);
+            jo.Add("isFamiliar", person.IsFamiliar);
+            jo.Add("patientId", person.PatientId);
+            jo.Add("riskFactor", person.RiskFactor);
+            jo.Add("defaultImageAddress", person.DefaultImageAddress);
+            jo.Add("updatedAt", person.UpdatedAt);
+
+            try
+            {
+                await personTable.InsertAsync(jo);
+            }
+            catch
+            {
+                await personTable.UpdateAsync(jo);
+            }
+        }
+
+
 
         public async static Task UploadFaceInfo(string personId, ObservableCollection<Face> addFaceList)
         {
             foreach (Face face in addFaceList)
             {
                 JObject jo = new JObject();
+                jo.Add("id", face.Id);
+                jo.Add("imageAddress", face.ImageAddress);
+                jo.Add("imageToken", face.ImageToken);
+                jo.Add("isDefault", face.IsDefault);
+                jo.Add("personId", personId);
+                jo.Add("warningId", face.WarningId);
+
                 try
                 {
-                    jo.Add("id", face.Id);
-                    jo.Add("imageAddress", face.ImageAddress);
-                    jo.Add("imageToken", face.ImageToken);
-                    jo.Add("isDefault", face.IsDefault);
-                    jo.Add("personId", face.PersonId);
-                    jo.Add("warningId", face.WarningId);
                     await faceTable.InsertAsync(jo);
                     //await faceTable.InsertAsync(face);
                 }
                 catch
                 {
-                    jo.Add("id", face.Id);
-                    jo.Add("imageAddress", face.ImageAddress);
-                    jo.Add("imageToken", face.ImageToken);
-                    jo.Add("isDefault", face.IsDefault);
-                    jo.Add("personId", face.PersonId);
-                    jo.Add("warningId", face.WarningId);
                     await faceTable.UpdateAsync(jo);
                     //await faceTable.UpdateAsync(face);
                 }
@@ -156,8 +189,53 @@ namespace FamilyNotes.Services
         }
 
 
+        public async static Task UploadOneFaceInfo(string personId, Face face)
+        {
+            face.PersonId = personId;
+
+            JObject jo = new JObject();
+            jo.Add("id", face.Id);
+            jo.Add("imageAddress", face.ImageAddress);
+            jo.Add("imageToken", face.ImageToken);
+            jo.Add("personId", face.PersonId);
+
+            try
+            {
+                await faceTable.InsertAsync(jo);
+                //await faceTable.InsertAsync(face);
+            }
+            catch
+            {
+                await faceTable.UpdateAsync(jo);
+                //await faceTable.UpdateAsync(face);
+            }
+
+            Face updatedFace = await UpdateFaceImageAddress(face);
+
+            //Update Person's Default Image Icon
+            if (face.IsDefault)
+            {
+                await UpdatePersonDefaultImageAddress(personId, updatedFace);
+            }
 
 
+        }
+
+        public async static Task UploadWarning(Warning warning)
+        {
+            warnings = await warningTable
+                .Where(warningTable => warningTable.PersonId == warning.PersonId).ToCollectionAsync();
+
+            if (warnings.Count > 0)
+            {
+                await warningTable.UpdateAsync(warning);
+            }
+            else
+            {
+                await warningTable.InsertAsync(warning);
+
+            }
+        }
 
 
         #endregion

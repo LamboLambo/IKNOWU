@@ -40,6 +40,8 @@ using Windows.UI.Xaml;
 using FamilyNotes.Models;
 using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
+using FamilyNotes.Services;
+using System.Collections.ObjectModel;
 
 namespace FamilyNotes
 {
@@ -50,9 +52,10 @@ namespace FamilyNotes
     class UserPresence : BindableBase
     {
 
-        public static BitmapImage faceImage = new BitmapImage();
-        public static bool isStrange = false;
-
+        public static Person thisPerson = new Person();
+        public static Face thisFace = new Face();
+        //ObservableCollection<Face> addFaceList = new ObservableCollection<Face>();
+        public static Warning thisWarning = new Warning();
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserPresence"/> class.
@@ -66,7 +69,7 @@ namespace FamilyNotes
             // This is just here until we incorporate the NoFacesTime into the settings
             NoFacesTime = 5000;
         }
-        
+
         /// <summary>
         /// Configures the camera and enables face detection.
         /// </summary>
@@ -125,7 +128,7 @@ namespace FamilyNotes
         /// <summary>
         /// The length of time (in milliseconds) to wait before resetting back to an unfiltered state if no faces are detected
         /// </summary>
-        public int NoFacesTime{ get; set; }
+        public int NoFacesTime { get; set; }
 
         /// <summary>
         /// The DeviceID for the camera. This is only important if we are not using the default camera.
@@ -145,7 +148,7 @@ namespace FamilyNotes
             }
         }
 
-        
+
         /// <summary>
         /// Event that is raised when a specific users face is detected.
         /// </summary>
@@ -354,7 +357,7 @@ namespace FamilyNotes
             // Ask the UI thread to render the face count information
             await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => CountDetectedFaces(args.ResultFrame.DetectedFaces));
         }
-        
+
         /// <summary>
         /// Retrieves the count of detected faces
         /// </summary>
@@ -377,7 +380,7 @@ namespace FamilyNotes
                 // Create a callback
                 TimerCallback noFacesCallback = (object stateInfo) =>
                 {
-                    _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () => 
+                    _dispatcher.RunAsync(CoreDispatcherPriority.Normal, () =>
                     {
                         OnFilterOnFace(_unfilteredName);
                         _noFacesTimer = null;
@@ -395,7 +398,7 @@ namespace FamilyNotes
             {
                 // Kick off the timer so we don't keep taking pictures, but will resubmit if we are not filtered
                 _holdForTimer = true;
-                
+
                 // Take the picture
                 _faceCaptureStill = await ApplicationData.Current.LocalFolder.CreateFileAsync("FaceDetected.jpg", CreationCollisionOption.ReplaceExisting);
                 await _mediaCapture.CapturePhotoToStorageFileAsync(ImageEncodingProperties.CreateJpeg(), _faceCaptureStill);
@@ -410,23 +413,55 @@ namespace FamilyNotes
                     }
                     else //strange face is detected
                     {
-                        //Create a new Person and new Face
-                        Person newStranger = new Person();
+                        //Create a new Person
+                        thisPerson = new Person();
+                        thisPerson.Name = "stranger";
+                        thisPerson.Relation = "";
+                        thisPerson.PatientId = MainPage.PatientId;
+                        await AzureDatabaseService.UploadPersonInfo(thisPerson);
+                        thisPerson = new Person();
+                        thisPerson = await AzureDatabaseService.GetLatestPerson();
+                        thisPerson.Name += thisPerson.Id;
+                        thisPerson.FriendlyName = thisPerson.Name;
+                        await AzureDatabaseService.UploadPersonInfo(thisPerson);
 
-                        Face newFace = new Face();
+                        //Create a new Face
+                        thisFace = new Face();
 
                         // Prepare the captured image
                         StorageFile newImageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("FaceDetected.jpg");
+                        StorageFolder newPersonFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + thisPerson.FriendlyName), CreationCollisionOption.OpenIfExists);
+                        await newImageFile.CopyAsync(newPersonFolder, "ProfilePhoto.jpg", NameCollisionOption.ReplaceExisting);
                         string faToken = null;
                         IRandomAccessStream irandom = await newImageFile.OpenAsync(FileAccessMode.Read);
                         faToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(newImageFile);
-                        await faceImage.SetSourceAsync(irandom);
 
-                        //Stranger Notice
-                        isStrange = true;
-                        await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
+                        thisFace.Image = new BitmapImage();
+                        await thisFace.Image.SetSourceAsync(irandom);
+                        thisFace.ImageToken = faToken;
+                        thisFace.IsDefault = true;
+                        
+
+                        //Upload the Face
+                        //addFaceList.Add(thisFace);
+                        await AzureDatabaseService.UploadOneFaceInfo(thisPerson.Id, thisFace);
+                        //addFaceList.Clear();
+                        thisFace = new Face();
+                        thisFace = await AzureDatabaseService.GetLatestFace();
+
+                        //Upload the image
+                        await AzureBlobService.UploadImageFromImageToken(faToken, thisFace.Id + ".jpg");
+
 
                         //Upload a Stranger Warning Enquiry
+                        thisWarning.PersonId = thisPerson.Id;
+                        await AzureDatabaseService.UploadWarning(thisWarning);
+
+                        //Stranger Notice
+                        MainPage.thisPhrase = "Stranger";
+                        await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
+
+
 
 
 
@@ -434,7 +469,7 @@ namespace FamilyNotes
                 }
 
                 // Allow the camera to take another picture in 10 seconds
-                TimerCallback callback = (Object stateInfo) => 
+                TimerCallback callback = (Object stateInfo) =>
                     {
                         // Now that the timer is expired, we no longer need to hold
                         // Nothing else to do since the timer will be restarted when the picture is taken
@@ -448,7 +483,7 @@ namespace FamilyNotes
             }
         }
 
-        
+
         // MediaCapture and its state variables
         private bool currentlyFiltered;
         private MediaCapture _mediaCapture;
