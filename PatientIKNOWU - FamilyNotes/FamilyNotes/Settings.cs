@@ -149,7 +149,7 @@ namespace FamilyNotes
             bool? useBingImage = (bool?)settings.Values[WALLPAPER];
             UseBingImageOfTheDay = useBingImage.HasValue ? useBingImage.Value : false;
             string faceApiKey = (string)settings.Values[MICRFOSOFT_FACESERVICE_KEY];
-            FaceApiKey = faceApiKey != null ? faceApiKey : "";
+            FaceApiKey = "e53bdf610980403fa6169d46319c5518"; //faceApiKey != null ? faceApiKey : "";
             bool? notFirstLaunch = (bool?)settings.Values[NOTFIRSTLAUNCH];
             LaunchedPreviously = notFirstLaunch.HasValue ? notFirstLaunch.Value : false;
             string defaultCameraID = (string)settings.Values[DEFAULTCAMERAID];
@@ -208,7 +208,7 @@ namespace FamilyNotes
         private bool _useBingImageOfTheDay;
         private bool _launchedPreviously;
         private string _defaultCameraID;
-        private string _faceApiKey = "";
+        private string _faceApiKey = "e53bdf610980403fa6169d46319c5518";
         private BitmapImage _familyNotesWallPaper = new BitmapImage(new Uri(new Uri("ms-appx://"), "Assets/brushed_metal_texture.jpg")); // Before the user has decided on the background, use the brushed steel.
         private const string WALLPAPER = "UseBingImageOfTheDay";
         private const string MICRFOSOFT_FACESERVICE_KEY = "MicrosoftFaceServiceKey";

@@ -148,6 +148,8 @@ namespace CaregiverIKNOWU
 
             //Data
             Faces.Clear();
+            addFaceList.Clear();
+            deleteFaceList.Clear();
         }
 
         private void clearWarningStatus()

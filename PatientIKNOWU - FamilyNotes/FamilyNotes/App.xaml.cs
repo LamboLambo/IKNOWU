@@ -38,6 +38,7 @@ using System.Runtime.Serialization.Json;
 using Windows.UI.Input.Inking;
 using Windows.Storage.Streams;
 using System.Collections.Generic;
+using Microsoft.WindowsAzure.MobileServices;
 
 namespace FamilyNotes
 {
@@ -457,5 +458,13 @@ namespace FamilyNotes
         public const string EVERYONE = "Everyone";
         public const string NOTES_INK_FILE = "Ink.isf";
         public const string NOTES_MODEL_FILE = "NotesData.json";
-    }
+
+
+
+        public static MobileServiceClient MobileService = new MobileServiceClient(
+"https://iknowu.azurewebsites.net");
+
+
+
+    }//end class
 }

@@ -37,6 +37,9 @@ using Windows.Storage;
 using Windows.UI.Core;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml;
+using FamilyNotes.Models;
+using Windows.Storage.Streams;
+using Windows.UI.Xaml.Media.Imaging;
 
 namespace FamilyNotes
 {
@@ -46,7 +49,11 @@ namespace FamilyNotes
     /// </summary>
     class UserPresence : BindableBase
     {
-                
+
+        public static BitmapImage faceImage = new BitmapImage();
+        public static bool isStrange = false;
+
+
         /// <summary>
         /// Initializes a new instance of the <see cref="UserPresence"/> class.
         /// </summary>
@@ -155,13 +162,13 @@ namespace FamilyNotes
         /// </summary>
         public class UserIdentifiedEventArgs : EventArgs
         {
-            public UserIdentifiedEventArgs(string s)
+            public UserIdentifiedEventArgs(string name)
             {
-                User = s;
+                User = name;
             }
             public string User { get; set; }
         }
-     
+
         /// <summary>
         /// Initializes the MediaCapture and starts preview.
         /// </summary>
@@ -222,6 +229,7 @@ namespace FamilyNotes
                 _cap = new CaptureElement();
             }
             _cap.Source = _mediaCapture;
+
 
             // Start the preview
             await _mediaCapture.StartPreviewAsync();
@@ -399,6 +407,29 @@ namespace FamilyNotes
                     if (UserName != "")
                     {
                         OnFilterOnFace(UserName);
+                    }
+                    else //strange face is detected
+                    {
+                        //Create a new Person and new Face
+                        Person newStranger = new Person();
+
+                        Face newFace = new Face();
+
+                        // Prepare the captured image
+                        StorageFile newImageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("FaceDetected.jpg");
+                        string faToken = null;
+                        IRandomAccessStream irandom = await newImageFile.OpenAsync(FileAccessMode.Read);
+                        faToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(newImageFile);
+                        await faceImage.SetSourceAsync(irandom);
+
+                        //Stranger Notice
+                        isStrange = true;
+                        await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
+
+                        //Upload a Stranger Warning Enquiry
+
+
+
                     }
                 }
 

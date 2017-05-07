@@ -22,6 +22,7 @@
 //  THE SOFTWARE.
 //  ---------------------------------------------------------------------------------
 
+using FamilyNotes.Models;
 using System;
 using Windows.Media.Capture;
 using Windows.Storage;

@@ -41,7 +41,7 @@ namespace FamilyNotes
 
         private void NotesPanel_Loaded(object sender, RoutedEventArgs e)
         {
-            CanvasControl.NoteInputModeChanged += CanvasControl_NoteInputModeChanged;
+            //CanvasControl.NoteInputModeChanged += CanvasControl_NoteInputModeChanged;
         }
 
         /// <summary>
@@ -81,7 +81,7 @@ namespace FamilyNotes
         /// <param name="person">The person to highlight notes for.</param>
         public void FilterNotes(Person person)
         {
-            CanvasControl.FilterNotes(person);
+            //CanvasControl.FilterNotes(person);
         }
 
         public int CountNotes(Person person)

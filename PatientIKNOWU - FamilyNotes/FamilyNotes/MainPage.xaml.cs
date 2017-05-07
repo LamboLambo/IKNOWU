@@ -38,6 +38,11 @@ using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Input;
 using Windows.UI.Xaml.Media;
 using Windows.UI.Xaml.Navigation;
+using FamilyNotes.Models;
+using Windows.UI.Xaml.Media.Imaging;
+using System.Collections.ObjectModel;
+using FamilyNotes.Services;
+using Windows.Media.SpeechSynthesis;
 
 namespace FamilyNotes
 {
@@ -47,6 +52,31 @@ namespace FamilyNotes
     public sealed partial class MainPage : Page
     {
         #region Initialization
+
+        bool internetConnection = false;
+        ContentDialog progressDialog;
+        private SpeechSynthesizer synthesizer;
+        public static MediaElement mediaElement;
+
+        //Materials
+        public static BitmapImage nullBitmapImage = new BitmapImage(new Uri("ms-appx:///Assets/Square150x150Logo.scale-200.png"));
+
+        //User Attributes
+        string PatientName = "John";
+        public static string PatientId = "afcwf342ju2q3r";
+
+        //Data and view model list of items
+        private ObservableCollection<Person> Persons;
+        Person thisPerson;
+        private ObservableCollection<ObservableCollection<Face>> Faces;
+        Face thisFace;
+        string thisPhrase;
+
+        public static bool isInformed = false;
+
+
+
+
 
         /// <summary>
         /// Initializes a new instance of the <see cref="MainPage"/> class.
@@ -63,17 +93,123 @@ namespace FamilyNotes
             FamilyModel = app.Model;
             AppSettings = app.AppSettings;
 
+            Persons = new ObservableCollection<Person>();
+            thisPerson = new Person();
+            Faces = new ObservableCollection<ObservableCollection<Face>>();
+            thisFace = new Face();
+
             // Initially assume we are unfiltered - all notes are shown.
             CurrentlyFiltered = false;
 
-            // Update greeting that appears at the top of the screen e.g. "Good morning"
-            UpdateGreeting(String.Empty);
+            synthesizer = new Windows.Media.SpeechSynthesis.SpeechSynthesizer();
+            mediaElement = new MediaElement();
 
-            // Create default notes if first launch
-            if (AppSettings.LaunchedPreviously != true)
-                CreateDefaultNotes();
+            // Update greeting that appears at the top of the screen e.g. "Good morning"
+            //UpdateGreeting(String.Empty);
+
+            //// Create default notes if first launch
+            //if (AppSettings.LaunchedPreviously != true)
+            //CreateDefaultNotes();
+
+            //Test the Internet Connection
+            testInternetConnection();
+
 
         }
+
+        private async Task speech(string phrase)
+        {
+            SpeechSynthesisStream stream = await synthesizer.SynthesizeTextToStreamAsync(phrase);
+            mediaElement.SetSource(stream, stream.ContentType);
+            mediaElement.Play();
+        }
+
+
+        /// <summary>
+        /// Test Internet Connection and Load Persons and Faces
+        /// </summary>
+        private async void testInternetConnection()
+        {
+            //Test Internet Connection
+            try
+            {
+                showProgressDialog("Checking the Internet Connection and Loading the data...");
+                progressDialog.Title = "Processing: ";
+                progressDialog.PrimaryButtonText = "Ok";
+                //statusTextBlock.Text = "Checking the Internet Connection...";
+
+                //Get Person List for this patient
+                Persons.Clear();
+                ObservableCollection<Person> persons = await AzureDatabaseService.GetPersonList(PatientId);
+                //statusTextBlock.Text = persons.Count + " Persons: ";
+                foreach (Person person in persons)
+                {
+                    //Update Info
+                    person.DefaultIcon = await AzureBlobService.DisplayImageFile(person.DefaultImageAddress);
+                    person.FriendlyName = person.Name;
+
+                    Persons.Add(person);
+
+                    //Get Face List for each person
+                    ObservableCollection<Face> faces = await AzureDatabaseService.GetFaceList(person.Id);
+                    foreach (Face face in faces)
+                    {
+                        face.Image = await AzureBlobService.DisplayImageFile(face.ImageAddress);
+                    }
+                    Faces.Add(faces);
+
+                    AddNewPersonFromDB(person, faces);
+
+                    //statusTextBlock.Text += faces.Count + " faces ";
+                }
+
+
+            }
+            catch (System.Net.Http.HttpRequestException)
+            {
+                internetConnection = false;
+                //statusTextBlock.Text = " ";
+                //showProgressDialog("Internet Connection Error! Please check your Internet connection.");
+                progressDialog.Title = "Internet Connection Error!";
+                progressDialog.PrimaryButtonText = "Ok, I know";
+                progressDialog.IsPrimaryButtonEnabled = true;
+                //await progressDialog.ShowAsync();
+
+                return;
+                //Test Internet Connection Again
+                //testInternetConnection();
+            }
+
+            internetConnection = true;
+            //statusTextBlock.Text = "Internet Connection Success!";
+            progressDialog.Content = "Finished!";
+            progressDialog.IsPrimaryButtonEnabled = true;
+            return;
+
+        }
+
+
+        private async void showProgressDialog(string content)
+        {
+            progressDialog = new ContentDialog()
+            {
+                Title = "Progress: ",
+                Content = content,
+                PrimaryButtonText = "Ok",
+                FullSizeDesired = false
+            };
+            progressDialog.IsPrimaryButtonEnabled = false;
+            await progressDialog.ShowAsync();
+        }
+
+
+
+
+
+
+
+
+
 
         /// <summary>
         /// This method is called when the app first appears, but it also checks if it has been launched
@@ -151,15 +287,15 @@ namespace FamilyNotes
             Person selectedPerson = FamilyModel.PersonFromName(nameTag);
             taskPanel.FilterNotes(selectedPerson);
 
-            // Determine whether or not we are currently filtering
-            if (selectedPerson.FriendlyName == _unfilteredName)
-            {
-                CurrentlyFiltered = false;
-            }
-            else
-            {
-                CurrentlyFiltered = true;
-            }
+            //// Determine whether or not we are currently filtering
+            //if (selectedPerson.FriendlyName == _unfilteredName)
+            //{
+            //    CurrentlyFiltered = false;
+            //}
+            //else
+            //{
+            //    CurrentlyFiltered = true;
+            //}
         }
 
         public void Public_AddNewPerson()
@@ -207,37 +343,63 @@ namespace FamilyNotes
         /// Display a friendly greeting at the top of the screen.
         /// </summary>
         /// <param name="name">Name of user for the salutation</param>
-        private async void UpdateGreeting(string name)
+        private async void UpdateGreeting(Person person)
         {
-            var now = DateTime.Now;
-            var greeting =
-                now.Hour < 12 ? "Good morning" :
-                now.Hour < 18 ? "Good afternoon" :
-                /* otherwise */ "Good night";
-            var person = (string.IsNullOrEmpty(name) || name == App.EVERYONE) ? "!" : $", {name}!";
-            TextGreeting.Text = $"{greeting}{person}";
+            //var now = DateTime.Now;
+            //var greeting =
+            //    now.Hour < 12 ? "Good morning" :
+            //    now.Hour < 18 ? "Good afternoon" :
+            //    /* otherwise */ "Good night";
+            string name = person.Name;
+            //var thisName = (string.IsNullOrEmpty(name) || name == App.EVERYONE) ? "!" : $", {name}!";
+            //TextGreeting.Text = $"{greeting}{person}";
 
-            if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE))
+            if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE) && isInformed == false)
             {
-                await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                await _speechManager.SpeakAsync("This is " + name, this._media);
+
+                //await speech("This is " + name);
+
+                if (person.Relation != "")
                 {
+                    string relation = "Your " + person.Relation;
+                    
+                    await _speechManager.SpeakAsync(" your " + person.Relation, this._media);
+                }
 
-                    var SpeakGreeting = $"{greeting} {name}";
+                if (person.IsFamiliar == false)
+                {
+                    await _speechManager.SpeakAsync("Stranger! Be careful!", this._media);
+                }
 
-                    var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
+                if (person.RiskFactor > 0)
+                {
+                    await _speechManager.SpeakAsync("Warning! Keep a distance!", this._media);
+                }
 
-                    if (notes > 0)
-                    {
-                        if (notes == 1)
-                            SpeakGreeting += ",there is a note for you.";
-                        else
-                            SpeakGreeting += $",there are {notes} notes for you.";
-                    }
 
-                    await this._speechManager.SpeakAsync(
-                        SpeakGreeting,
-                         this._media);
-                });
+
+                //isInformed = true;
+
+                //await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
+                //{
+
+                //    var SpeakGreeting = $"{greeting} {name}";
+
+                //    //var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
+
+                //    //if (notes > 0)
+                //    //{
+                //    //    if (notes == 1)
+                //    //        SpeakGreeting += ",there is a note for you.";
+                //    //    else
+                //    //        SpeakGreeting += $",there are {notes} notes for you.";
+                //    //}
+
+                //    await this._speechManager.SpeakAsync(
+                //        SpeakGreeting,
+                //         this._media);
+                //});
             }
         }
 
@@ -257,8 +419,29 @@ namespace FamilyNotes
 
         private void UserFilterFromDetection(object sender, UserPresence.UserIdentifiedEventArgs e)
         {
-            this.Public_ShowNotesForPerson(e.User);
-            UpdateGreeting(e.User);
+            //this.Public_ShowNotesForPerson(e.User);
+            
+
+            string thisName = e.User;
+
+            foreach (Person person in Persons)
+            {
+                if (person.Name == thisName)
+                {
+                    thisPerson = person;
+                    break;
+                }
+            }
+
+            UpdateGreeting(thisPerson);
+
+
+
+
+
+
+
+
         }
 
         #endregion
@@ -347,6 +530,81 @@ namespace FamilyNotes
             }
         }
 
+        private async void AddNewPersonFromDB(Person person, ObservableCollection<Face> faces)
+        {
+            var dialog = new AddPersonContentDialog();
+
+            //dialog.ProvideExistingPerson(currentPerson);
+            //await dialog.ShowAsync();
+
+            //dialog.AddedPerson = person;
+            //Person newPerson = dialog.AddedPerson;
+            Person newPerson = person;
+
+
+            // If there is a valid person to add, add them
+            if (newPerson != null)
+            {
+                try
+                {
+                    // Get or create a directory for the user (we do this regardless of whether or not there is a profile picture)
+                    StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.FailIfExists);
+                    StorageFile userFile = await userFolder.CreateFileAsync("ProfilePhoto.jpg", CreationCollisionOption.OpenIfExists);
+                    foreach (Face face in faces)
+                    {
+                        await AzureBlobService.DownloadFaceImageAsFile(face, userFile);
+                    }
+
+                    newPerson.IsProfileImage = true;
+                    newPerson.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
+
+
+                }
+                catch
+                {
+
+                }
+
+                // See if we have a profile photo
+                //if (dialog.TemporaryFile != null)
+                //{
+                // Save off the profile photo and delete the temporary file
+                //await dialog.TemporaryFile.CopyAsync(userFolder, "ProfilePhoto.jpg", NameCollisionOption.GenerateUniqueName);
+                //await dialog.TemporaryFile.DeleteAsync();
+
+                // Update the profile picture for the person
+
+                if (AppSettings.FaceApiKey != "")
+                {
+                    await FacialSimilarity.AddTrainingImageAsync(newPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{newPerson.FriendlyName}/ProfilePhoto.jpg"));
+                }
+
+                person = newPerson;
+
+                //}
+                // Add the user if it is new now that changes have been made
+                //if (currentPerson == null)
+                //{
+                //    await FamilyModel.AddPersonAsync(newPerson);
+                //}
+                // Otherwise we had a user, so update the current one
+                //else
+                //{
+                //    //await FamilyModel.UpdatePersonImageAsync(newPerson);
+                //    Person personToUpdate = FamilyModel.PersonFromName(currentPerson.FriendlyName);
+                //    if (personToUpdate != null)
+                //    {
+                //        personToUpdate.IsProfileImage = true;
+                //        personToUpdate.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
+                //    }
+                //}
+            }
+        }
+
+
+
+
+
         private void AddPersonTapped(object sender, TappedRoutedEventArgs e)
         {
             // Add null if there is no existing person
@@ -363,16 +621,20 @@ namespace FamilyNotes
                 return;
             }
 
-            if (SetCameraButton.IsEnabled)
-            {
-                // Make sure the user accepts privacy implications.
-                var dialog = new WarningDialog();
-                await dialog.ShowAsync();
-                if (dialog.WarningAccept == false)
-                {
-                    return;
-                }
-            }
+            //if (SetCameraButton.IsEnabled)
+            //{
+            //    // Make sure the user accepts privacy implications.
+            //    var dialog = new WarningDialog();
+            //    //await dialog.ShowAsync();
+            //    if (dialog.WarningAccept == false)
+            //    {
+            //        return;
+            //    }
+            //}
+
+            //Set the camera device
+            SetCameraDevice();
+
 
             bool result = await _presence.EnableFaceDetection();
             if (result)
@@ -394,32 +656,35 @@ namespace FamilyNotes
             // Update the face detection icon depending on whether the effect exists or not
             FaceDetectionDisabledIcon.Visibility = (result != true) ? Visibility.Visible : Visibility.Collapsed;
             FaceDetectionEnabledIcon.Visibility = (result == true) ? Visibility.Visible : Visibility.Collapsed;
-            SetCameraButton.IsEnabled = (result != true);
+            //SetCameraButton.IsEnabled = (result != true);
         }
 
         /// <summary>
         /// Sets the camera object to use, in case you don't want to use the default
         /// </summary>
-        private async void SetCameraDevice(object sender, TappedRoutedEventArgs e)
+        private async void SetCameraDevice() //object sender, TappedRoutedEventArgs e
         {
-            // Create a DevicePicker
-            var devicePicker = new DevicePicker();
+            var _deviceList = await DeviceInformation.FindAllAsync(DeviceClass.VideoCapture);
+            _presence.CameraDeviceId = _deviceList[_deviceList.Count - 1].Id;  //if there's a external camera, use it; if none, use the built-in camera. 
 
-            // Set that we are looking for video capture devices
-            devicePicker.Filter.SupportedDeviceClasses.Add(DeviceClass.VideoCapture);
+            //// Create a DevicePicker
+            //var devicePicker = new DevicePicker();
 
-            // Calculate the position to show the picker (right below the buttons)
-            GeneralTransform transform = SetCameraButton.TransformToVisual(null);
-            Point point = transform.TransformPoint(new Point());
-            Rect rect = new Rect(point, new Point(point.X + SetCameraButton.ActualWidth, point.Y + SetCameraButton.ActualHeight));
+            //// Set that we are looking for video capture devices
+            //devicePicker.Filter.SupportedDeviceClasses.Add(DeviceClass.VideoCapture);
 
-            // Use the device picker to pick the device
-            DeviceInformation deviceInfo = await devicePicker.PickSingleDeviceAsync(rect);
-            if (null != deviceInfo)
-            {
-                _presence.CameraDeviceId = deviceInfo.Id;
-                _presence.IsDefaultCapture = false;
-            }
+            //// Calculate the position to show the picker (right below the buttons)
+            //GeneralTransform transform = SetCameraButton.TransformToVisual(null);
+            //Point point = transform.TransformPoint(new Point());
+            //Rect rect = new Rect(point, new Point(point.X + SetCameraButton.ActualWidth, point.Y + SetCameraButton.ActualHeight));
+
+            //// Use the device picker to pick the device
+            //DeviceInformation deviceInfo = await devicePicker.PickSingleDeviceAsync(rect);
+            //if (null != deviceInfo)
+            //{
+            //    _presence.CameraDeviceId = deviceInfo.Id;
+            //    _presence.IsDefaultCapture = false;
+            //}
         }
 
         private void TidyNotes(object sender, TappedRoutedEventArgs e)
@@ -443,7 +708,7 @@ namespace FamilyNotes
             CurrentlyFiltered = selectedPerson.FriendlyName != _unfilteredName;
 
             // Update greeting that appears at the top of the screen e.g. "Good morning"
-            UpdateGreeting(selectedPerson.FriendlyName);
+            //UpdateGreeting(selectedPerson.FriendlyName);
         }
 
 
@@ -750,23 +1015,23 @@ namespace FamilyNotes
 
         public void CreateDefaultNotes()
         {
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "6/6\n\nYou can also use voice commands, such as 'Add new note' Try 'What can I say?' for help.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "6/6\n\nYou can also use voice commands, such as 'Add new note' Try 'What can I say?' for help.";
 
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the relevant user's button on the left, or by turning on the camera if using face recognition.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "5/6\n\nFilter notes by tapping the relevant user's button on the left, or by turning on the camera if using face recognition.";
 
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Face API Key, add it to the app settings, and then enable the feature.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "4/6\n\nIf you want to use the face recognition feature: obtain a Face API Key, add it to the app settings, and then enable the feature.";
 
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "3/6\n\nNow you can add new notes by pressing the 'New note' button and selecting 'Everyone' or another user.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "3/6\n\nNow you can add new notes by pressing the 'New note' button and selecting 'Everyone' or another user.";
 
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "2/6\n\nTo get started, you should add some users by tapping on the 'New person' button at the bottom of the screen.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "2/6\n\nTo get started, you should add some users by tapping on the 'New person' button at the bottom of the screen.";
 
-            this._activeNote = CreateNote(App.EVERYONE);
-            this._activeNote.NoteText = "1/6\n\nWelcome to Family Notes!\nOnce you have read these sample notes, you can delete them by tapping on the little X in the top left.";
+            //this._activeNote = CreateNote(App.EVERYONE);
+            //this._activeNote.NoteText = "1/6\n\nWelcome to Family Notes!\nOnce you have read these sample notes, you can delete them by tapping on the little X in the top left.";
         }
 
         #region Private fields
@@ -776,12 +1041,22 @@ namespace FamilyNotes
         private UserPresence _presence;
         private const string _detectionString = "Detected faces : ";
         private CoreDispatcher _dispatcher;
-        private SpeechManager _speechManager;
+        public static SpeechManager _speechManager;
         private VoiceCommandObjects.VoiceCommand _pageParameters;
         private bool _currentlyFiltered;
         private const string _helpString = "You can say: add note for person, or, create note to person, or, new note to person. For the active note, you can say, edit note, read note, and delete note.";
 
         #endregion
-    }
+
+        private void TestInternetConnection_Click(object sender, RoutedEventArgs e)
+        {
+            testInternetConnection();
+        }
+
+        private void button_Click(object sender, RoutedEventArgs e)
+        {
+            speech("完美");
+        }
+    }//end class
 
 }
