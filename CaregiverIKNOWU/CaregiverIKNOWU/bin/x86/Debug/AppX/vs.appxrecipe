@@ -16,7 +16,7 @@
     <PackageRegistrationPath>
     </PackageRegistrationPath>
     <RemoveNonLayoutFiles>true</RemoveNonLayoutFiles>
-    <RegisteredManifestChecksum>797C5A37E0909562A2334D928AC7D8D94A26AA8E7629DC85666BA662BFC9AE9C</RegisteredManifestChecksum>
+    <RegisteredManifestChecksum>2DAE9910C2FB17D742F2BDDF4C2122CF11107D1BDD9752490E16835570D030CF</RegisteredManifestChecksum>
     <RegisteredPackageMoniker>adb9be87-f119-4168-94a6-e7627e52d46e_1.0.0.0_x86__cyanyqm0ktqz2</RegisteredPackageMoniker>
     <RegisteredUserModeAppID>adb9be87-f119-4168-94a6-e7627e52d46e_cyanyqm0ktqz2!App</RegisteredUserModeAppID>
     <RegisteredPackageID>adb9be87-f119-4168-94a6-e7627e52d46e</RegisteredPackageID>
@@ -28,13 +28,13 @@
     <AppXManifest Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-06T10:54:48.785</Modified>
+      <Modified>2017-05-08T17:51:23.703</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.exe">
       <PackagePath>entrypoint\CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-06T10:54:46.588</Modified>
+      <Modified>2017-05-08T17:51:21.214</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\.nuget\packages\Microsoft.Azure.Mobile.Client\3.1.0\lib\netcore45\Microsoft.WindowsAzure.Mobile.Ext.dll">
       <PackagePath>Microsoft.WindowsAzure.Mobile.Ext.dll</PackagePath>
@@ -604,18 +604,22 @@
       <PackagePath>Assets\Add_person.png</PackagePath>
       <Modified>2017-04-27T05:06:01.910</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\StoreLogo.scale-100.png">
+      <PackagePath>Assets\StoreLogo.scale-100.png</PackagePath>
+      <Modified>2017-05-08T06:13:03.000</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Warning.png">
       <PackagePath>Assets\Warning.png</PackagePath>
       <Modified>2017-05-01T12:03:14.913</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\LockScreenLogo.scale-200.png">
       <PackagePath>Assets\LockScreenLogo.scale-200.png</PackagePath>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:12:41.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\SplashScreen.scale-200.png">
       <PackagePath>Assets\SplashScreen.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:13:30.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Square150x150Logo.scale-200.png">
       <PackagePath>Assets\Square150x150Logo.scale-200.png</PackagePath>
@@ -625,22 +629,21 @@
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Square44x44Logo.scale-200.png">
       <PackagePath>Assets\Square44x44Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:12:16.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Square44x44Logo.targetsize-24_altform-unplated.png">
       <PackagePath>Assets\Square44x44Logo.targetsize-24_altform-unplated.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:11:38.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\StoreLogo.png">
       <PackagePath>Assets\StoreLogo.png</PackagePath>
-      <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:13:03.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Wide310x150Logo.scale-200.png">
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2015-09-20T09:30:08.000</Modified>
+      <Modified>2017-05-08T06:13:59.000</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Brushed_metal_texture.jpg">
       <PackagePath>Assets\Brushed_metal_texture.jpg</PackagePath>
@@ -652,7 +655,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.xr.xml">
       <PackagePath>CaregiverIKNOWU.xr.xml</PackagePath>
-      <Modified>2017-05-06T10:46:36.882</Modified>
+      <Modified>2017-05-07T16:41:46.911</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
@@ -661,11 +664,11 @@
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-06T10:46:38.611</Modified>
+      <Modified>2017-05-08T07:11:36.230</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\CaregiverIKNOWU.exe">
       <PackagePath>CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-06T10:54:48.778</Modified>
+      <Modified>2017-05-08T17:51:23.696</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

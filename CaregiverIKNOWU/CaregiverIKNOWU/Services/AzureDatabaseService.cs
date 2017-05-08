@@ -69,6 +69,24 @@ namespace CaregiverIKNOWU.Services
             }
         }
 
+
+        public async static Task<Person> GetOnePersonFromId(string personId)
+        {
+            persons = await personTable
+                .Where(personTable => personTable.Id == personId).ToCollectionAsync();
+
+            if (persons.Count == 0)
+            {
+                return null;
+            }
+            else
+            {
+                return persons[0];
+            }
+
+        }
+
+
         public async static Task<ObservableCollection<Face>> GetFaceList(string personId)
         {
             faces = await faceTable.Where(faceTable => faceTable.PersonId == personId).ToCollectionAsync();
@@ -84,6 +102,30 @@ namespace CaregiverIKNOWU.Services
                 .Where(faceTable => faceTable.ImageToken == imageToken).ToCollectionAsync();
             return faces[0];
         }
+
+
+        /// <summary>
+        /// Get the Unfinished Warning List
+        /// </summary>
+        /// <param name="patientId"></param>
+        /// <returns></returns>
+        public async static Task<ObservableCollection<Warning>> GetUnfinishedWarningList(string patientId)
+        {
+            warnings = await warningTable
+                .Where(warningTable => warningTable.IsFinished == false)
+                .Where(warningTable => warningTable.PatientId == patientId)
+                .OrderByDescending(warningTable => warningTable.CreatedAt)
+                .ToCollectionAsync();
+
+            ObservableCollection<Warning> unfinishedWarningList = new ObservableCollection<Warning>();
+            foreach (Warning warning in warnings)
+            {
+                unfinishedWarningList.Add(warning);
+            }
+            return unfinishedWarningList;
+        }
+
+
 
 
 
@@ -184,6 +226,26 @@ namespace CaregiverIKNOWU.Services
             jo.Add("id", personId);
             jo.Add("defaultImageAddress", AzureBlobService.GetImageAddress(face.Id + ".jpg"));
             await personTable.UpdateAsync(jo);
+        }
+
+        public async static Task UpdatePersonInfoWithId(Person person)
+        {
+            JObject jo = new JObject();
+            jo.Add("id", person.Id);
+            jo.Add("name", person.Name);
+            jo.Add("relation", person.Relation);
+            jo.Add("isFamiliar", person.IsFamiliar);
+            jo.Add("riskFactor", person.RiskFactor);
+            await personTable.UpdateAsync(jo);
+        }
+
+        public async static Task UpdateWarningEnquiryWithId(Warning warning)
+        {
+            JObject jo = new JObject();
+            jo.Add("id", warning.Id);
+            jo.Add("isFinished", warning.IsFinished);
+            jo.Add("isFamiliar", warning.IsFamiliar);
+            await warningTable.UpdateAsync(jo);
         }
 
 

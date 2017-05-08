@@ -21,6 +21,8 @@ using Windows.Media.Capture;
 using CaregiverIKNOWU.Controls;
 using CaregiverIKNOWU.Models;
 using CaregiverIKNOWU.Services;
+using Windows.System.Threading;
+using Windows.UI.Core;
 
 namespace CaregiverIKNOWU
 {
@@ -46,6 +48,12 @@ namespace CaregiverIKNOWU
         Face thisFace;  
         private ObservableCollection<Face> addFaceList;
         private ObservableCollection<Face> deleteFaceList;
+        private ObservableCollection<Warning> unfinishedWarningList;
+
+        //Timer and value
+        TimeSpan checkEnquiryTimeSpan = TimeSpan.FromSeconds(5);
+        ThreadPoolTimer CheckEnquiryTimer;
+        int t = 0;
 
 
         public MainPage()
@@ -59,6 +67,7 @@ namespace CaregiverIKNOWU
             thisFace = new Face();
             addFaceList = new ObservableCollection<Face>();
             deleteFaceList = new ObservableCollection<Face>();
+            unfinishedWarningList = new ObservableCollection<Warning>();
 
             //Initialize the app's settings
             AppSettings = new Settings();
@@ -69,9 +78,13 @@ namespace CaregiverIKNOWU
             initializePersonInfoDialog();
 
 
+            if (unfinishedWarningList.Count > 0)
+            {
+                WarningImage.Visibility = Visibility.Visible;
+            }
+
             //Test the Internet Connection
             testInternetConnection();
-
 
 
         }
@@ -101,8 +114,15 @@ namespace CaregiverIKNOWU
                     Persons.Add(person);
                 }
 
-                //var testInternetConnection = await AzureDatabaseService.GetPersonList(PatientId);
-                //var testInternetConnection = await AzureDatabaseService.isPersonTableEmpty(PatientId);
+                //Check the unfinished Stranger Warning Enquiry
+                unfinishedWarningList = await AzureDatabaseService.GetUnfinishedWarningList(PatientId);
+                if (unfinishedWarningList.Count > 0)
+                {
+                    WarningImage.Visibility = Visibility.Visible;
+                }
+
+
+
             }
             catch (System.Net.Http.HttpRequestException)
             {
@@ -119,11 +139,40 @@ namespace CaregiverIKNOWU
                 //testInternetConnection();
             }
 
+            //Set up the timer to check Stranger Warning Enquiry
+            CheckEnquiryTimer = ThreadPoolTimer.CreatePeriodicTimer(async (source) =>
+            {
+                //t++; //for testing
+
+                //Check the unfinished Stranger Warning Enquiry
+                unfinishedWarningList = await AzureDatabaseService.GetUnfinishedWarningList(PatientId);
+
+                // Update the UI thread by using the UI core dispatcher.
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                     {
+                         //testTextBlock.Text = t.ToString(); //for testing
+
+                         if (unfinishedWarningList.Count > 0)
+                         {
+                             WarningImage.Visibility = Visibility.Visible;
+                         }
+
+                     });
+
+            }, checkEnquiryTimeSpan);
+
             internetConnection = true;
             statusTextBlock.Text = "Internet Connection Success!";
             //progressDialog.Content = "Internet Connection Success!";
             //progressDialog.IsPrimaryButtonEnabled = true;
+
+
             return;
+
+        }
+
+        private void startCheckEnquiryTimer()
+        {
 
         }
 
@@ -194,7 +243,7 @@ namespace CaregiverIKNOWU
             await progressDialog.ShowAsync();
         }
 
-        private async void loadPersons()
+        private async void loadPersonsAndCheckEnquiry()
         {
             Persons.Clear();
             ObservableCollection<Person> persons = await AzureDatabaseService.GetPersonList(PatientId);
@@ -202,6 +251,15 @@ namespace CaregiverIKNOWU
             {
                 Persons.Add(person);
             }
+
+            //Check the unfinished Stranger Warning Enquiry
+            unfinishedWarningList = await AzureDatabaseService.GetUnfinishedWarningList(PatientId);
+            if (unfinishedWarningList.Count > 0)
+            {
+                WarningImage.Visibility = Visibility.Visible;
+            }
+
+
         }
 
 
@@ -258,11 +316,41 @@ namespace CaregiverIKNOWU
             //Show the Person Info Dialog
             var result = await PersonDialog.ShowAsync();
 
-            // Value 1 indicates primary button was selected by the user, which adds a new Person
+            // Value 1 indicates primary button was selected by the user, which modify a new Person
             if ((int)result == 1)
             {
-                //TODO: Enable the Update of Person Info
+                //Enable the Update of Person Info
+                //Apply the Data
+                showProgressDialog("Apply the Data...");
+                thisPerson.Name = PersonNameInput.Text;
+                thisPerson.Relation = PersonRelationInput.Text;
+                thisPerson.RiskFactor = (int)riskSlider.Value;
 
+                //Upload Person Info
+                progressDialog.Content = "Update Person Info...";
+                await AzureDatabaseService.UpdatePersonInfoWithId(thisPerson);
+
+                //Upload Face Info
+                progressDialog.Content = "Upload Faces and Images...";
+                foreach (Face face in addFaceList)
+                {
+                    face.PersonId = thisPerson.Id;
+                }
+                await AzureDatabaseService.UploadFaceInfo(thisPerson.Id, addFaceList);
+                foreach (Face face in deleteFaceList)
+                {
+                    await AzureDatabaseService.DeleteFace(face);
+                }
+
+                //TODO: Cannot update the default image address in the Person
+
+
+                //Reload Persons List
+                loadPersonsAndCheckEnquiry();
+
+                //Add a Person Finished!
+                progressDialog.Content = "Update a Person Finished !";
+                progressDialog.IsPrimaryButtonEnabled = true;
 
 
             }//end result == 1
@@ -344,7 +432,7 @@ namespace CaregiverIKNOWU
                     }
 
                     //Reload Persons List
-                    loadPersons();
+                    loadPersonsAndCheckEnquiry();
 
                     //Add a Person Finished!
                     progressDialog.Content = "Add a Person Finished !";
@@ -360,12 +448,70 @@ namespace CaregiverIKNOWU
 
         private async void WarningImage_Tapped(object sender, TappedRoutedEventArgs e)
         {
-            //get the person info
+            //get the stranger info
+            thisPerson = await AzureDatabaseService.GetOnePersonFromId(unfinishedWarningList[0].PersonId);
+            defaultImage.Source = await AzureBlobService.DisplayImageFile(thisPerson.DefaultImageAddress);
 
+            familiarRadioButton.IsChecked = thisPerson.IsFamiliar;
+            strangeRadioButton.IsChecked = !thisPerson.IsFamiliar;
 
+            //Update Faces
+            Faces.Clear();
+            ObservableCollection<Face> faces = await AzureDatabaseService.GetFaceList(thisPerson.Id);
+            foreach (Face face in faces)
+            {
+                face.Image = await AzureBlobService.DisplayImageFile(face.ImageAddress);
+                Faces.Add(face);
+            }
 
 
             var result = await PersonDialog.ShowAsync();
+
+            // Value 1 indicates primary button was selected by the user, which modify the Person
+            if ((int)result == 1)
+            {
+                //Enable the Update of Person Info
+                //Apply the Data
+                showProgressDialog("Apply the Data...");
+                thisPerson.Name = PersonNameInput.Text;
+                thisPerson.Relation = PersonRelationInput.Text;
+                thisPerson.RiskFactor = (int)riskSlider.Value;
+
+                //Upload Person Info
+                progressDialog.Content = "Update Person Info...";
+                await AzureDatabaseService.UpdatePersonInfoWithId(thisPerson);
+
+                //Upload Face Info
+                progressDialog.Content = "Upload Faces and Images...";
+                foreach (Face face in addFaceList)
+                {
+                    face.PersonId = thisPerson.Id;
+                }
+                await AzureDatabaseService.UploadFaceInfo(thisPerson.Id, addFaceList);
+                foreach (Face face in deleteFaceList)
+                {
+                    await AzureDatabaseService.DeleteFace(face);
+                }
+
+                //TODO: Cannot update the default image address in the Person
+
+                //Operate the Enquiry Info
+                progressDialog.Content = "Operate the Enquiry Info...";
+                Warning thisWarning = unfinishedWarningList[0];
+                thisWarning.IsFinished = true;
+                thisWarning.IsFamiliar = thisPerson.IsFamiliar;
+                await AzureDatabaseService.UpdateWarningEnquiryWithId(thisWarning);
+
+                //Reload Persons List
+                loadPersonsAndCheckEnquiry();
+
+                //Add a Person Finished!
+                progressDialog.Content = "Operate the Enquiry Finished !";
+                progressDialog.IsPrimaryButtonEnabled = true;
+
+
+
+            }//end result == 1
 
 
             initializePersonInfoDialog();

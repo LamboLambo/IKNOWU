@@ -34,6 +34,7 @@ namespace CaregiverIKNOWU.Models
         public int RiskFactor { get; set; }
 
 
+
         //Tempory Storage
         public BitmapImage DefaultIcon { get; set; }
 

@@ -118,6 +118,7 @@
   <ItemGroup>
     <Content Include="Assets\Add_person.png" />
     <Content Include="Assets\Brushed_metal_texture.jpg" />
+    <Content Include="Assets\StoreLogo.scale-100.png" />
     <Content Include="Assets\Warning.png" />
     <Content Include="Properties\Default.rd.xml" />
     <Content Include="Assets\LockScreenLogo.scale-200.png" />

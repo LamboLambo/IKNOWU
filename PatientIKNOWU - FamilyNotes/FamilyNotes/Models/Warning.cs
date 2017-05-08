@@ -25,8 +25,11 @@ namespace FamilyNotes.Models
         [JsonProperty(PropertyName = "personId")]
         public string PersonId { get; set; }
 
+        [JsonProperty(PropertyName = "patientId")]
+        public string PatientId { get; set; }
 
-
+        [JsonProperty(PropertyName = "isFinished")]
+        public bool IsFinished { get; set; }
 
 
 

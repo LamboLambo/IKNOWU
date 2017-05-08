@@ -43,6 +43,7 @@ using Windows.UI.Xaml.Media.Imaging;
 using System.Collections.ObjectModel;
 using FamilyNotes.Services;
 using Windows.Media.SpeechSynthesis;
+using Windows.System.Threading;
 
 namespace FamilyNotes
 {
@@ -66,15 +67,22 @@ namespace FamilyNotes
         public static string PatientId = "afcwf342ju2q3r";
 
         //Data and view model list of items
-        private ObservableCollection<Person> Persons;
+        public static ObservableCollection<Person> Persons;
         Person thisPerson;
-        private ObservableCollection<ObservableCollection<Face>> Faces;
+        ObservableCollection<ObservableCollection<Face>> Faces;
         Face thisFace;
         public static string thisPhrase = "";
+        public static string listenAgainButtonName = "Listen Again";
+
 
         public static bool isInformed = false;
 
 
+        ////Timer and value
+        //TimeSpan checkSecondsTimeSpan = TimeSpan.FromSeconds(10);
+        //ThreadPoolTimer checkSecondsTimer;
+        //public static int t = 0;
+        //public static bool isOnTime = false;
 
 
 
@@ -146,14 +154,16 @@ namespace FamilyNotes
                 //Clear Local User Folder
                 StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\"), CreationCollisionOption.OpenIfExists);
                 await userFolder.DeleteAsync();
+                userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\"), CreationCollisionOption.OpenIfExists);
 
+                //Perform initialization for facial detection.
+                await FacialSimilarity.TrainDetectionAsync();
 
                 //Download each person
                 foreach (Person person in persons)
                 {
                     //Update Info
                     person.DefaultIcon = await AzureBlobService.DisplayImageFile(person.DefaultImageAddress);
-                    person.FriendlyName = person.Name;
 
                     Persons.Add(person);
 
@@ -169,6 +179,7 @@ namespace FamilyNotes
 
                     //statusTextBlock.Text += faces.Count + " faces ";
                 }
+
 
 
             }
@@ -210,14 +221,6 @@ namespace FamilyNotes
         }
 
 
-
-
-
-
-
-
-
-
         /// <summary>
         /// This method is called when the app first appears, but it also checks if it has been launched
         /// using Cortana's voice commands, and takes appropriate action if this is the case.
@@ -246,7 +249,7 @@ namespace FamilyNotes
             //Perform initialization for facial detection.
             if (AppSettings.FaceApiKey != "")
             {
-                await FacialSimilarity.TrainDetectionAsync();
+                //await FacialSimilarity.TrainDetectionAsync();
             }
 
             // Perform initialization for speech recognition.
@@ -339,7 +342,7 @@ namespace FamilyNotes
                         }
                         else
                         {
-                            ImageWarningBox.Visibility = Visibility.Visible;
+                            //ImageWarningBox.Visibility = Visibility.Visible;
                         }
                     }
                 }
@@ -352,75 +355,60 @@ namespace FamilyNotes
         /// <param name="name">Name of user for the salutation</param>
         private async void UpdateGreeting(Person person)
         {
-            //var now = DateTime.Now;
-            //var greeting =
-            //    now.Hour < 12 ? "Good morning" :
-            //    now.Hour < 18 ? "Good afternoon" :
-            //    /* otherwise */ "Good night";
-
-            //var thisName = (string.IsNullOrEmpty(name) || name == App.EVERYONE) ? "!" : $", {name}!";
-            //TextGreeting.Text = $"{greeting}{person}";
-
             string name = person.Name;
 
             if (!name.Contains("stranger"))
             {
-                //This is a Familiar Person
+                //This is a loaded familiar Person
+                if (thisPhrase.Contains(name)){
+                    //This face is the same as the last one, keep quiet
 
-                thisPhrase = "This is: " + name + "!";
-
-                if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE) && isInformed == false)
+                }
+                else
                 {
-                    await _speechManager.SpeakAsync("This is: " + name + "!", this._media);
+                    //This is a different face, tell the name
 
-                    //await speech("This is " + name);
+                    thisPhrase = "This is: " + name + "!";
 
-                    if (person.Relation != "")
+                    //listenAgainButtonName = name;
+                    listenAgainButton.Content = name;
+
+                    if (!string.IsNullOrEmpty(name) && (name != App.EVERYONE) && isInformed == false)
                     {
-                        thisPhrase += " Your " + person.Relation + "!";
-                        await _speechManager.SpeakAsync("Your " + person.Relation + "!", this._media);
+                        await _speechManager.SpeakAsync("This is: " + name + "!", this._media);
+
+                        //await speech("This is " + name);
+
+                        if (person.Relation != "")
+                        {
+                            thisPhrase += " Your " + person.Relation + "!";
+
+                            await _speechManager.SpeakAsync("Your " + person.Relation + "!", this._media);
+                        }
+
+                        if (person.IsFamiliar == false)
+                        {
+                            thisPhrase += " Stranger! Be careful!";
+                            await _speechManager.SpeakAsync("Stranger! Be careful!", this._media);
+                        }
+
+                        if (person.RiskFactor > 0)
+                        {
+                            thisPhrase += " Warning! Keep a distance!";
+                            await _speechManager.SpeakAsync("Warning! Keep a distance!", this._media);
+                        }
                     }
-
-                    if (person.IsFamiliar == false)
-                    {
-                        thisPhrase += " Stranger! Be careful!";
-                        await _speechManager.SpeakAsync("Stranger! Be careful!", this._media);
-                    }
-
-                    if (person.RiskFactor > 0)
-                    {
-                        thisPhrase += " Warning! Keep a distance!";
-                        await _speechManager.SpeakAsync("Warning! Keep a distance!", this._media);
-                    }
-
-
-
                     //isInformed = true;
 
-                    //await _dispatcher.RunAsync(CoreDispatcherPriority.Normal, async () =>
-                    //{
-
-                    //    var SpeakGreeting = $"{greeting} {name}";
-
-                    //    //var notes = taskPanel.CountNotes(FamilyModel.PersonFromName(name));
-
-                    //    //if (notes > 0)
-                    //    //{
-                    //    //    if (notes == 1)
-                    //    //        SpeakGreeting += ",there is a note for you.";
-                    //    //    else
-                    //    //        SpeakGreeting += $",there are {notes} notes for you.";
-                    //    //}
-
-                    //    await this._speechManager.SpeakAsync(
-                    //        SpeakGreeting,
-                    //         this._media);
-                    //});
                 }
             }
             else{
-                //This is a stranger
-                await _speechManager.SpeakAsync("This is a stranger!", this._media);
+                //This is a loaded stranger
+                thisPhrase = "This is a stranger!";
+                //listenAgainButtonName = "Stranger";
+                listenAgainButton.Content = "Stranger";
+
+                await _speechManager.SpeakAsync(thisPhrase, this._media);
 
             }
         }
@@ -447,7 +435,7 @@ namespace FamilyNotes
 
             foreach (Person person in Persons)
             {
-                if (person.Name == thisName)
+                if (person.Name == thisName || thisName.Contains(person.Name))
                 {
                     thisPerson = person;
                     UpdateGreeting(thisPerson);
@@ -545,7 +533,7 @@ namespace FamilyNotes
 
         private async void AddNewPersonFromDB(Person person, ObservableCollection<Face> faces)
         {
-            var dialog = new AddPersonContentDialog();
+            //var dialog = new AddPersonContentDialog();
 
             //dialog.ProvideExistingPerson(currentPerson);
             //await dialog.ShowAsync();
@@ -561,7 +549,17 @@ namespace FamilyNotes
                 try
                 {
                     // Get or create a directory for the user (we do this regardless of whether or not there is a profile picture)
-                    StorageFolder userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.FailIfExists);
+                    StorageFolder userFolder;
+
+                    if (person.FriendlyName != null && person.FriendlyName != "" && person.FriendlyName.Contains("stranger") && person.Name.Contains("stranger"))
+                    {
+                        userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.FailIfExists);
+                    }
+                    else
+                    {
+                        userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.Name), CreationCollisionOption.FailIfExists);
+                    }
+
                     StorageFile userFile = await userFolder.CreateFileAsync("ProfilePhoto.jpg", CreationCollisionOption.OpenIfExists);
                     foreach (Face face in faces)
                     {
@@ -586,11 +584,7 @@ namespace FamilyNotes
                 //await dialog.TemporaryFile.DeleteAsync();
 
                 // Update the profile picture for the person
-
-                if (AppSettings.FaceApiKey != "")
-                {
-                    await FacialSimilarity.AddTrainingImageAsync(newPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{newPerson.FriendlyName}/ProfilePhoto.jpg"));
-                }
+                await FacialSimilarity.AddTrainingImageAsync(newPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{newPerson.FriendlyName}/ProfilePhoto.jpg"));
 
                 person = newPerson;
 
@@ -612,6 +606,9 @@ namespace FamilyNotes
                 //    }
                 //}
             }
+
+
+
         }
 
 
@@ -653,17 +650,17 @@ namespace FamilyNotes
             if (result)
             {
                 _presence.FilterOnFace += UserFilterFromDetection;
-                CountBox.Visibility = Visibility.Visible;
+                //CountBox.Visibility = Visibility.Visible;
                 if (!_currentlyFiltered)
                 {
-                    ImageWarningBox.Visibility = Visibility.Visible;
+                    //ImageWarningBox.Visibility = Visibility.Visible;
                 }
             }
             else
             {
                 _presence.FilterOnFace -= UserFilterFromDetection;
-                CountBox.Visibility = Visibility.Collapsed;
-                ImageWarningBox.Visibility = Visibility.Collapsed;
+                //CountBox.Visibility = Visibility.Collapsed;
+                //ImageWarningBox.Visibility = Visibility.Collapsed;
             }
 
             // Update the face detection icon depending on whether the effect exists or not
@@ -1070,10 +1067,10 @@ namespace FamilyNotes
         {
             captureImage.Source = UserPresence.thisFace.Image;
 
-            await speech("完美");
+            await speech("完美 apple");
         }
 
-        private async void userButton_Click(object sender, RoutedEventArgs e)
+        private async void listenAgainButton_Click(object sender, RoutedEventArgs e)
         {
             if (thisPhrase != "")
             {
@@ -1081,9 +1078,85 @@ namespace FamilyNotes
             }
         }
 
+        private async void stopButton_Click(object sender, RoutedEventArgs e)
+        {
+            changeCameraState();
+
+            listenAgainButton.Visibility = Visibility.Collapsed;
+            startButton.Visibility = Visibility.Visible;
+            stopButton.Visibility = Visibility.Collapsed;
+
+            //listenAgainButtonName = "Listen Again";
+            listenAgainButton.Content = "Listen Again";
+
+        }
+
+        private async void startButton_Click(object sender, RoutedEventArgs e)
+        {
+            startButton.IsEnabled = false;
+
+
+            //Perform initialization for facial detection.
+            await FacialSimilarity.TrainDetectionAsync();
 
 
 
+            //Open the camera
+            changeCameraState();
+
+
+            listenAgainButton.Visibility = Visibility.Visible;
+            stopButton.Visibility = Visibility.Visible;
+            startButton.Visibility = Visibility.Collapsed;
+            startButton.IsEnabled = true;
+
+
+            ////Set up the timer
+            //checkSecondsTimer = ThreadPoolTimer.CreatePeriodicTimer(async (source) =>
+            //{
+            //    t += 10;
+
+            //    isOnTime = true;
+
+            //    // Update the UI thread by using the UI core dispatcher.
+            //    await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+            //    {
+            //        statusTextBlock.Text = t.ToString();
+
+            //    });
+
+            //}, checkSecondsTimeSpan);
+
+
+        }
+
+        public async void changeCameraState()
+        {
+            //Set the camera device
+            SetCameraDevice();
+
+            bool result = await _presence.EnableFaceDetection();
+            if (result)
+            {
+                _presence.FilterOnFace += UserFilterFromDetection;
+                CountBox.Visibility = Visibility.Visible;
+                if (!_currentlyFiltered)
+                {
+                    //ImageWarningBox.Visibility = Visibility.Visible;
+                }
+            }
+            else
+            {
+                _presence.FilterOnFace -= UserFilterFromDetection;
+                CountBox.Visibility = Visibility.Collapsed;
+                //ImageWarningBox.Visibility = Visibility.Collapsed;
+            }
+
+            // Update the face detection icon depending on whether the effect exists or not
+            FaceDetectionDisabledIcon.Visibility = (result != true) ? Visibility.Visible : Visibility.Collapsed;
+            FaceDetectionEnabledIcon.Visibility = (result == true) ? Visibility.Visible : Visibility.Collapsed;
+
+        }
 
 
 

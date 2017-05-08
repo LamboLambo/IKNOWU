@@ -223,6 +223,9 @@ namespace FamilyNotes.Services
 
         public async static Task UploadWarning(Warning warning)
         {
+            warning.PatientId = MainPage.PatientId;
+            warning.IsFinished = false;
+
             warnings = await warningTable
                 .Where(warningTable => warningTable.PersonId == warning.PersonId).ToCollectionAsync();
 

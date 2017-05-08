@@ -42,6 +42,7 @@ using Windows.Storage.Streams;
 using Windows.UI.Xaml.Media.Imaging;
 using FamilyNotes.Services;
 using System.Collections.ObjectModel;
+using Windows.System.Threading;
 
 namespace FamilyNotes
 {
@@ -375,7 +376,7 @@ namespace FamilyNotes
                 }
             }
             // Otherwise, if we are filtering and don't have a timer
-            else if (_currentlyFiltered && (_noFacesTimer == null))
+            else if (_currentlyFiltered &&  (_noFacesTimer == null)) 
             {
                 // Create a callback
                 TimerCallback noFacesCallback = (object stateInfo) =>
@@ -392,12 +393,15 @@ namespace FamilyNotes
                 _noFacesTimer = new Timer(noFacesCallback, null, NoFacesTime, Timeout.Infinite);
             }
 
+            
+
             // We are also going to take an image the first time that we detect exactly one face.
             // Sidenote - to avoid a race-condition, I had to use a boolean. Just checking for _faceCaptureStill == null could produce an error.
-            if ((faces.Count == 1) && !_holdForTimer && !_currentlyFiltered)
+            if ((faces.Count == 1) && !_holdForTimer) //  && !_currentlyFiltered   
             {
                 // Kick off the timer so we don't keep taking pictures, but will resubmit if we are not filtered
                 _holdForTimer = true;
+                //MainPage.isOnTime = false;
 
                 // Take the picture
                 _faceCaptureStill = await ApplicationData.Current.LocalFolder.CreateFileAsync("FaceDetected.jpg", CreationCollisionOption.ReplaceExisting);
@@ -413,25 +417,27 @@ namespace FamilyNotes
                     }
                     else //strange face is detected
                     {
+                        #region a strange face is detected
                         //Create a new Person
                         thisPerson = new Person();
                         thisPerson.Name = "stranger";
+                        thisPerson.FriendlyName = "stranger";
                         thisPerson.Relation = "";
                         thisPerson.PatientId = MainPage.PatientId;
                         await AzureDatabaseService.UploadPersonInfo(thisPerson);
                         thisPerson = new Person();
                         thisPerson = await AzureDatabaseService.GetLatestPerson();
-                        thisPerson.Name += thisPerson.Id;
-                        thisPerson.FriendlyName = thisPerson.Name;
+                        thisPerson.FriendlyName += thisPerson.Id;
                         await AzureDatabaseService.UploadPersonInfo(thisPerson);
+                        
 
                         //Create a new Face
                         thisFace = new Face();
 
                         // Prepare the captured image
                         StorageFile newImageFile = await ApplicationData.Current.LocalFolder.GetFileAsync("FaceDetected.jpg");
-                        StorageFolder newPersonFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + thisPerson.FriendlyName), CreationCollisionOption.OpenIfExists);
-                        await newImageFile.CopyAsync(newPersonFolder, "ProfilePhoto.jpg", NameCollisionOption.ReplaceExisting);
+                        //StorageFolder newPersonFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + thisPerson.FriendlyName), CreationCollisionOption.OpenIfExists);
+                        //await newImageFile.CopyAsync(newPersonFolder, "ProfilePhoto.jpg", NameCollisionOption.ReplaceExisting);
                         string faToken = null;
                         IRandomAccessStream irandom = await newImageFile.OpenAsync(FileAccessMode.Read);
                         faToken = Windows.Storage.AccessCache.StorageApplicationPermissions.FutureAccessList.Add(newImageFile);
@@ -448,39 +454,75 @@ namespace FamilyNotes
                         //addFaceList.Clear();
                         thisFace = new Face();
                         thisFace = await AzureDatabaseService.GetLatestFace();
+                        ObservableCollection<Face> newFaces = new ObservableCollection<Face>();
+                        newFaces.Add(thisFace);
+
+
+                        MainPage.Persons.Add(thisPerson);
+                        //MainPage.Faces.Add(newFaces);
 
                         //Upload the image
-                        await AzureBlobService.UploadImageFromImageToken(faToken, thisFace.Id + ".jpg");
+                        //await AzureBlobService.UploadImageFromImageToken(faToken, thisFace.Id + ".jpg");
+                        Face updatedFace = await AzureDatabaseService.UpdateFaceImageAddress(thisFace);
+                        thisFace = updatedFace;
+                        await AzureDatabaseService.UpdatePersonDefaultImageAddress(thisPerson.Id, thisFace);
+                        thisPerson = await AzureDatabaseService.GetLatestPerson();
 
+                        MainPage.Persons.Add(thisPerson);
 
                         //Upload a Stranger Warning Enquiry
                         thisWarning.PersonId = thisPerson.Id;
                         await AzureDatabaseService.UploadWarning(thisWarning);
 
+                        // Update the profile picture for the person
+                        //await FacialSimilarity.AddTrainingImageAsync(thisPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{thisPerson.FriendlyName}/ProfilePhoto.jpg"));
+                        AddNewPersonFromDB(thisPerson, newFaces);
+
                         //Stranger Notice
-                        MainPage.thisPhrase = "Stranger";
+                        MainPage.thisPhrase = "stranger";
+                        StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Media");
+                        StorageFile file = await folder.GetFileAsync("dong.wav");
+                        var soundStream = await file.OpenAsync(FileAccessMode.Read);
+                        MainPage.mediaElement.SetSource(soundStream, file.ContentType);
+                        MainPage.mediaElement.Play();
+
                         await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
 
+                        
+                        //Perform initialization for facial detection.
+                        //await FacialSimilarity.TrainDetectionAsync();
 
-
-
-
+                        #endregion
                     }
                 }
 
                 // Allow the camera to take another picture in 10 seconds
                 TimerCallback callback = (Object stateInfo) =>
+                {
+                    // Now that the timer is expired, we no longer need to hold
+                    // Nothing else to do since the timer will be restarted when the picture is taken
+                    _holdForTimer = false;
+                    if (_pictureTimer != null)
                     {
-                        // Now that the timer is expired, we no longer need to hold
-                        // Nothing else to do since the timer will be restarted when the picture is taken
-                        _holdForTimer = false;
-                        if (_pictureTimer != null)
-                        {
-                            _pictureTimer.Dispose();
-                        }
-                    };
+                        _pictureTimer.Dispose();
+                    }
+                };
                 _pictureTimer = new Timer(callback, null, 10000, Timeout.Infinite);
-            }
+
+
+                //// (Use Delay) Allow the camera to take another picture in 10 seconds
+                //TimeSpan delay = TimeSpan.FromSeconds(10);
+
+                //ThreadPoolTimer DelayTimer = ThreadPoolTimer.CreateTimer(
+                //    (source) =>
+                //    {
+                //        _holdForTimer = false;
+
+                //    }, delay);
+
+            }//end if ((faces.Count == 1) && !_holdForTimer && !_currentlyFiltered)
+
+
         }
 
 
@@ -498,5 +540,89 @@ namespace FamilyNotes
         private const string _detectionString = "Detected faces : ";
         private static Timer _noFacesTimer;
         private string _unfilteredName;
-    }
+
+
+
+        private async void AddNewPersonFromDB(Person person, ObservableCollection<Face> faces)
+        {
+            //var dialog = new AddPersonContentDialog();
+
+            //dialog.ProvideExistingPerson(currentPerson);
+            //await dialog.ShowAsync();
+
+            //dialog.AddedPerson = person;
+            //Person newPerson = dialog.AddedPerson;
+            Person newPerson = person;
+
+
+            // If there is a valid person to add, add them
+            if (newPerson != null)
+            {
+                try
+                {
+                    // Get or create a directory for the user (we do this regardless of whether or not there is a profile picture)
+                    StorageFolder userFolder;
+                    if (person.FriendlyName != null && person.FriendlyName != "" && person.FriendlyName.Contains("stranger"))
+                    {
+                        userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.FriendlyName), CreationCollisionOption.FailIfExists);
+                    }
+                    else
+                    {
+                        userFolder = await ApplicationData.Current.LocalFolder.CreateFolderAsync(("Users\\" + newPerson.Name), CreationCollisionOption.FailIfExists);
+                    }
+
+                    StorageFile userFile = await userFolder.CreateFileAsync("ProfilePhoto.jpg", CreationCollisionOption.OpenIfExists);
+                    foreach (Face face in faces)
+                    {
+                        await AzureBlobService.DownloadFaceImageAsFile(face, userFile);
+                    }
+
+                    newPerson.IsProfileImage = true;
+                    newPerson.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
+
+
+                }
+                catch
+                {
+
+                }
+
+                // See if we have a profile photo
+                //if (dialog.TemporaryFile != null)
+                //{
+                // Save off the profile photo and delete the temporary file
+                //await dialog.TemporaryFile.CopyAsync(userFolder, "ProfilePhoto.jpg", NameCollisionOption.GenerateUniqueName);
+                //await dialog.TemporaryFile.DeleteAsync();
+
+                // Update the profile picture for the person
+                await FacialSimilarity.AddTrainingImageAsync(newPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{newPerson.FriendlyName}/ProfilePhoto.jpg"));
+
+                person = newPerson;
+
+                //}
+                // Add the user if it is new now that changes have been made
+                //if (currentPerson == null)
+                //{
+                //    await FamilyModel.AddPersonAsync(newPerson);
+                //}
+                // Otherwise we had a user, so update the current one
+                //else
+                //{
+                //    //await FamilyModel.UpdatePersonImageAsync(newPerson);
+                //    Person personToUpdate = FamilyModel.PersonFromName(currentPerson.FriendlyName);
+                //    if (personToUpdate != null)
+                //    {
+                //        personToUpdate.IsProfileImage = true;
+                //        personToUpdate.ImageFileName = userFolder.Path + "\\ProfilePhoto.jpg";
+                //    }
+                //}
+            }
+
+
+
+        }
+
+
+
+    }//end class
 }
