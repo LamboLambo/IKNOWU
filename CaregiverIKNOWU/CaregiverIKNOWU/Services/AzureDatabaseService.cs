@@ -274,9 +274,30 @@ namespace CaregiverIKNOWU.Services
         #region Delete Methods
         public async static Task DeleteFace(Face face)
         {
+            faces = await faceTable.ToCollectionAsync();
             JObject jo = new JObject();
             jo.Add("id", face.Id);
             await faceTable.DeleteAsync(jo);
+        }
+
+        public async static Task DeletePersonAndItsFaces(Person person)
+        {
+            //Delete its faces
+            faces = await faceTable.Where(faceTable => faceTable.PersonId == person.Id).ToCollectionAsync();
+            foreach (Face face in faces)
+            {
+                await faceTable.DeleteAsync(face);
+            }
+
+            //TODO: Delete blob images
+
+
+            //Delete the person
+            persons = await personTable.ToCollectionAsync();
+            JObject jo = new JObject();
+            jo.Add("id", person.Id);
+            await personTable.DeleteAsync(jo);
+
         }
 
 

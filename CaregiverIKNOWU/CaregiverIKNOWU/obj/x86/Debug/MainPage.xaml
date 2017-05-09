@@ -13,7 +13,7 @@
         <converter:BitmapToBrushConverter x:Key="BitmapToBrushConverter" />
 
         <DataTemplate x:Key="PersonItemTemplate"                         >
-            <StackPanel x:ConnectionId='5' x:Name="Grid_item" CanDrag="false" Orientation="Vertical" Margin="5" Width="160" Height="240" HorizontalAlignment="Center" VerticalAlignment="Center">
+            <StackPanel x:ConnectionId='5' x:Name="Grid_item" CanDrag="false" Orientation="Vertical" Margin="5" Width="160" Height="232" HorizontalAlignment="Center" VerticalAlignment="Center">
                 <Image x:ConnectionId='6'                               Height="170" Width="170" HorizontalAlignment="Center"/>
                 <Viewbox HorizontalAlignment="Stretch" Height="30">
                     <TextBlock x:ConnectionId='8'                      FontWeight="Bold" HorizontalAlignment="Center" TextWrapping="WrapWholeWords"/>
@@ -44,7 +44,7 @@
                     Icon="AddFriend"
                     Label="Add New Patient"/>
                 <!--Tapped="AddPatientTapped"-->
-                
+
                 <!--<AppBarButton 
                     x:Name="FaceDetectionButton"
                     Tapped="FaceDetectionButton_Tapped" 
@@ -83,23 +83,25 @@
             Height="Auto"
                                                                                                                         >
             <Grid.RowDefinitions>
-                <RowDefinition Height="91*"/>
-                <RowDefinition Height="154*"/>
-                <RowDefinition Height="75*"/>
+                <RowDefinition Height="140*"/>
+                <RowDefinition Height="351*"/>
+                <RowDefinition Height="149*"/>
             </Grid.RowDefinitions>
 
-            <Grid x:ConnectionId='45' x:Name="faceDatabase" Visibility="Visible"  Margin="0,2.6,0,6.4" Background="#E5FFFFFF" Grid.Row="1" Canvas.ZIndex="0" >
+            <Grid x:ConnectionId='45' x:Name="faceDatabase" Visibility="Visible"  Margin="0,1,0,4.2" Background="#E5FFFFFF" Grid.Row="1" Canvas.ZIndex="0" >
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="19*"/>
-                    <RowDefinition Height="131*"/>
+                    <RowDefinition Height="49*"/>
+                    <RowDefinition Height="257*"/>
+                    <RowDefinition Height="41*"/>
                 </Grid.RowDefinitions>
                 <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="843*"/>
-                    <ColumnDefinition Width="181*"/>
+                    <ColumnDefinition Width="833*"/>
+                    <ColumnDefinition Width="200*"/>
                 </Grid.ColumnDefinitions>
-                <TextBlock Text="Person Database: " FontWeight="SemiBold" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" Margin="10,10,0,5" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center"/>
-                <TextBlock x:ConnectionId='47' x:Name="statusTextBlock" Text=" " FontWeight="Normal" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" Margin="0,5,10,5" FontSize="15" HorizontalAlignment="Right"  VerticalAlignment="Center" Foreground="#FFFF2B2B"/>
-                <GridView x:ConnectionId='48' x:Name="personGridView" Margin="10,5,10,10"  Grid.Column="0" Grid.Row="1"
+                <TextBlock Text="Person Database: " FontWeight="SemiBold" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" Margin="10,15,0,6.8" FontSize="20" HorizontalAlignment="Left" VerticalAlignment="Center" Height="27" Width="156"/>
+                <TextBlock x:ConnectionId='47' x:Name="statusTextBlock" Text=" " FontWeight="Normal" Grid.Column="0" Grid.Row="0" TextWrapping="WrapWholeWords" FontSize="15" HorizontalAlignment="Right"  VerticalAlignment="Center" Foreground="#FFFF2B2B" Height="27" Width="312" Margin="0,11,9.6,10.8" TextAlignment="Right"/>
+                <Button x:ConnectionId='48'  x:Name="deletePersonButton" Content="Delete this chosen Person" IsEnabled="False" Width="220" Grid.Row="2" Grid.Column="0" HorizontalAlignment="Center"  VerticalAlignment="Center"                                  Height="33" Margin="303,3.4,302.6,4.4" />
+                <GridView x:ConnectionId='49' x:Name="personGridView" Margin="10,5.2,9.6,11.6"  Grid.Column="0" Grid.Row="1"
                                                          
                           ItemTemplate="{StaticResource PersonItemTemplate}" BorderBrush="#FF494949" BorderThickness="1,1,1,1"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Enabled"
@@ -111,9 +113,9 @@
                         <SolidColorBrush Color="Gray" Opacity="0"/>
                     </GridView.Background>
                 </GridView>
-                <Button x:ConnectionId='49' x:Name="addPersonButton" IsEnabled="True" Grid.Row="1" Margin="9.8,10.4,10,10.2" HorizontalAlignment="Stretch" Grid.Column="1" VerticalAlignment="Stretch"                                                                                                                                 >
+                <Button x:ConnectionId='50' x:Name="addPersonButton" IsEnabled="True" Grid.Row="1" Margin="10,10,10,10" HorizontalAlignment="Stretch" Grid.Column="1" VerticalAlignment="Stretch"                                                                                                                                 >
                     <Button.Background>
-                        <ImageBrush x:ConnectionId='50' x:Name="addPersonButton_imageBrush" Stretch="Uniform" ImageSource="Assets/Add_person.png" Opacity="0.9"/>
+                        <ImageBrush x:ConnectionId='51' x:Name="addPersonButton_imageBrush" Stretch="Uniform" ImageSource="Assets/Add_person.png" Opacity="0.9"/>
                     </Button.Background>
                     <!--<Button.Template>
                         <ControlTemplate TargetType="Button" >
@@ -124,7 +126,7 @@
             </Grid>
 
 
-            <Image x:ConnectionId='46' x:Name="WarningImage" Visibility="Collapsed" Source="Assets/Warning.png" HorizontalAlignment="Right" Height="100" Margin="0,50,50,0" VerticalAlignment="Top" Width="100"                             />
+            <Image x:ConnectionId='46' x:Name="WarningImage" Visibility="Collapsed" Source="Assets/Warning.png" HorizontalAlignment="Center" Height="100" Margin="0,10,0,0" VerticalAlignment="Top" Width="100"                             />
 
 
 
@@ -144,7 +146,7 @@
                         PrimaryButtonText="Done"
                         IsPrimaryButtonEnabled="True"
                         SecondaryButtonText="Cancel"
-                        Visibility="Visible"
+                        Visibility="Collapsed"
                         MaxWidth="{Binding ActualWidth, ElementName=pageRoot}">
             <ScrollViewer VerticalScrollMode="Auto" VerticalScrollBarVisibility="Auto" HorizontalScrollMode="Auto" HorizontalScrollBarVisibility="Auto">
                 <StackPanel x:ConnectionId='21' x:Name="PersonDialogPanel" BorderBrush="#FFFB2323" BorderThickness="0">
@@ -274,7 +276,7 @@
 
         <Button x:ConnectionId='15' x:Name="testButton" Visibility="Collapsed"   Content="Test Button&#xD;&#xA;ddd" HorizontalAlignment="Left" Margin="10,10,0,0" VerticalAlignment="Top" Background="#FFF34A4A" Width="155" Height="77"                         />
         <Image x:ConnectionId='16' x:Name="testImage" Source="Assets/Square150x150Logo.scale-200.png" Visibility="Collapsed"   HorizontalAlignment="Left" Margin="10,92,0,0" VerticalAlignment="Top"  Width="155" Height="77" />
-        <TextBlock x:ConnectionId='17' x:Name="testTextBlock" Visibility="Visible"  Text=" " HorizontalAlignment="Left" Margin="38,92,0,0" VerticalAlignment="Top" Width="155" Height="77"/>
+        <TextBlock x:ConnectionId='17' x:Name="testTextBlock" Visibility="Collapsed"  Text=" " HorizontalAlignment="Left" Margin="38,92,0,0" VerticalAlignment="Top" Width="155" Height="77"/>
 
 
 

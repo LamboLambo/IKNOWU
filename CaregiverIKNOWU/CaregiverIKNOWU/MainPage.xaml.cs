@@ -359,9 +359,6 @@ namespace CaregiverIKNOWU
 
                 }
 
-                //TODO: Cannot update the default image address together with adding this new faces
-
-
                 //Reload Persons List
                 loadPersonsAndCheckEnquiry();
 
@@ -374,10 +371,13 @@ namespace CaregiverIKNOWU
 
             initializePersonInfoDialog();
 
+            deletePersonButton.IsEnabled = true;
+
         }
 
         private void personGridView_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
+
             if (e.AddedItems != null && e.AddedItems.Any())
             {
                 GridViewItem gridViewFaceItem = personGridView.ContainerFromItem(e.AddedItems[0]) as GridViewItem;
@@ -443,6 +443,7 @@ namespace CaregiverIKNOWU
                         face.PersonId = thisPerson.Id;
                     }
                     await AzureDatabaseService.UploadFaceInfo(thisPerson.Id, addFaceList);
+
                     foreach (Face face in deleteFaceList)
                     {
                         await AzureDatabaseService.DeleteFace(face);
@@ -714,7 +715,11 @@ namespace CaregiverIKNOWU
         {
             Faces.Remove(thisFace);
 
-            if (!addFaceList.Contains(thisFace))
+            if (addFaceList.Contains(thisFace))
+            {
+                addFaceList.Remove(thisFace);
+            }
+            else
             {
                 deleteFaceList.Add(thisFace);
             }
@@ -799,6 +804,46 @@ namespace CaregiverIKNOWU
 
 
         }
+
+        private async void deletePersonButton_Click(object sender, RoutedEventArgs e)
+        {
+            //Double check whether to delete
+            progressDialog = new ContentDialog()
+            {
+                Title = " ",
+                Content = "Do you really want to delete the chosen person?",
+                PrimaryButtonText = "Yes, please delete it.",
+                SecondaryButtonText = "Cancel",
+                FullSizeDesired = false
+            };
+            progressDialog.IsPrimaryButtonEnabled = true;
+            int result = (int) await progressDialog.ShowAsync();
+
+            if (result == 1)
+            {
+                //Deletion begin
+                showProgressDialog("Deleting the person");
+
+                await AzureDatabaseService.DeletePersonAndItsFaces(thisPerson);
+                thisPerson = null;
+                deletePersonButton.IsEnabled = false;
+
+                progressDialog.Content = "Deletion Finished !";
+                progressDialog.IsPrimaryButtonEnabled = true;
+
+                //Reload Persons List
+                loadPersonsAndCheckEnquiry();
+            }
+
+        }
+
+
+
+
+
+
+
+
 
 
 
