@@ -335,14 +335,31 @@ namespace CaregiverIKNOWU
                 foreach (Face face in addFaceList)
                 {
                     face.PersonId = thisPerson.Id;
+                    Faces.Remove(face);
                 }
-                await AzureDatabaseService.UploadFaceInfo(thisPerson.Id, addFaceList);
+
+                ObservableCollection<Face> newAddFaceList = await AzureDatabaseService.UploadFaceInfo(thisPerson.Id, addFaceList);
+
+                foreach (Face face in addFaceList)
+                {
+                    Faces.Add(face);
+                }
+
                 foreach (Face face in deleteFaceList)
                 {
                     await AzureDatabaseService.DeleteFace(face);
                 }
 
-                //TODO: Cannot update the default image address in the Person
+                try
+                {
+                    await AzureDatabaseService.UpdateFaceIsDefault(thisPerson.Id, Faces);
+                }
+                catch
+                {
+
+                }
+
+                //TODO: Cannot update the default image address together with adding this new faces
 
 
                 //Reload Persons List
@@ -627,6 +644,7 @@ namespace CaregiverIKNOWU
             // Set the Token and Add it to the list
             thisFace.ImageToken = faToken;
             thisFace.Image = bitmapImage;
+            thisFace.IsDefault = false;
             addFaceList.Add(thisFace);
             Faces.Add(thisFace);
 
@@ -677,6 +695,7 @@ namespace CaregiverIKNOWU
             // Set the Token and Add it to the list
             thisFace.ImageToken = faToken;
             thisFace.Image = bitmapImage;
+            thisFace.IsDefault = false;
             addFaceList.Add(thisFace);
             Faces.Add(thisFace);
 

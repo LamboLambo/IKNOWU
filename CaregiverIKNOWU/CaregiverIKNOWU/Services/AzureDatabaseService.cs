@@ -34,7 +34,9 @@ namespace CaregiverIKNOWU.Services
 
         public async static Task<ObservableCollection<Person>> GetPersonList(string patientId)
         {
-            persons = await personTable.Where(personTable => personTable.PatientId == patientId).ToCollectionAsync();
+            persons = await personTable
+                .Where(personTable => personTable.Name != "stranger")
+                .Where(personTable => personTable.PatientId == patientId).ToCollectionAsync();
             ObservableCollection<Person> personList = new ObservableCollection<Person>();
             foreach (Person person in persons)
             {
@@ -159,30 +161,26 @@ namespace CaregiverIKNOWU.Services
         }
 
 
-        public async static Task UploadFaceInfo(string personId, ObservableCollection<Face> addFaceList)
+        public async static Task<ObservableCollection<Face>> UploadFaceInfo(string personId, ObservableCollection<Face> addFaceList)
         {
+            ObservableCollection<Face> newAddFaceList = new ObservableCollection<Face>();
+
             foreach (Face face in addFaceList)
             {
                 JObject jo = new JObject();
-                try
-                {
                     jo.Add("id", face.Id);
                     jo.Add("imageAddress", face.ImageAddress);
                     jo.Add("imageToken", face.ImageToken);
                     jo.Add("isDefault", face.IsDefault);
                     jo.Add("personId", face.PersonId);
                     jo.Add("warningId", face.WarningId);
+                try
+                {
                     await faceTable.InsertAsync(jo);
                     //await faceTable.InsertAsync(face);
                 }
                 catch
                 {
-                    jo.Add("id", face.Id);
-                    jo.Add("imageAddress", face.ImageAddress);
-                    jo.Add("imageToken", face.ImageToken);
-                    jo.Add("isDefault", face.IsDefault);
-                    jo.Add("personId", face.PersonId);
-                    jo.Add("warningId", face.WarningId);
                     await faceTable.UpdateAsync(jo);
                     //await faceTable.UpdateAsync(face);
                 }
@@ -195,11 +193,31 @@ namespace CaregiverIKNOWU.Services
                     await UpdatePersonDefaultImageAddress(personId, updatedFace);
                 }
 
+                //Add the face into newAddFaceList
+                newAddFaceList.Add(updatedFace);
+
             }//end foreach
+
+            return newAddFaceList;
         }
 
 
+        public async static Task UpdateFaceIsDefault(string personId, ObservableCollection<Face> faces)
+        {
+            foreach (Face face in faces)
+            {
+                JObject jo = new JObject();
+                jo.Add("id", face.Id);
+                jo.Add("isDefault", face.IsDefault);
+                jo.Add("personId", face.PersonId);
+                await faceTable.UpdateAsync(jo);
 
+                if (face.IsDefault == true)
+                {
+                    await UpdatePersonDefaultImageAddress(personId, face);
+                }
+            }
+        }
 
 
 
