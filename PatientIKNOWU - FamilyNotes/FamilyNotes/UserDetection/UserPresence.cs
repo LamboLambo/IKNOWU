@@ -418,6 +418,14 @@ namespace FamilyNotes
                     else //strange face is detected
                     {
                         #region a strange face is detected
+
+                        //Voice Feedback
+
+                        //await MainPage._speechManager.SpeakAsync("Stranger! Sending the enquiry", MainPage.mediaElement);
+
+                        //Stranger Notice
+                        MainPage.thisPhrase = "stranger! Sending the enquiry!"; //stranger1
+
                         //Create a new Person
                         thisPerson = new Person();
                         thisPerson.Name = "stranger";
@@ -478,19 +486,21 @@ namespace FamilyNotes
                         //await FacialSimilarity.AddTrainingImageAsync(thisPerson.FriendlyName, new Uri($"ms-appdata:///local/Users/{thisPerson.FriendlyName}/ProfilePhoto.jpg"));
                         AddNewPersonFromDB(thisPerson, newFaces);
 
-                        //Stranger Notice
-                        MainPage.thisPhrase = "stranger";
-                        StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Media");
-                        StorageFile file = await folder.GetFileAsync("dong.wav");
-                        var soundStream = await file.OpenAsync(FileAccessMode.Read);
-                        MainPage.mediaElement.SetSource(soundStream, file.ContentType);
-                        MainPage.mediaElement.Play();
+                        MainPage.thisPhrase = "Stranger! Be careful!"; //stranger2
 
-                        await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
+                        //StorageFolder folder = await Windows.ApplicationModel.Package.Current.InstalledLocation.GetFolderAsync("Media");
+                        //StorageFile file = await folder.GetFileAsync("dong.wav");
+                        //var soundStream = await file.OpenAsync(FileAccessMode.Read);
+                        //MainPage.mediaElement.SetSource(soundStream, file.ContentType);
+                        //MainPage.mediaElement.Play();
 
-                        
-                        //Perform initialization for facial detection.
+                        //await MainPage._speechManager.SpeakAsync("Stranger", MainPage.mediaElement);
+
+
+                        ////Perform initialization for facial detection.
                         //await FacialSimilarity.TrainDetectionAsync();
+
+
 
                         #endregion
                     }
@@ -507,18 +517,8 @@ namespace FamilyNotes
                         _pictureTimer.Dispose();
                     }
                 };
-                _pictureTimer = new Timer(callback, null, 10000, Timeout.Infinite);
+                _pictureTimer = new Timer(callback, null, 5000, Timeout.Infinite);
 
-
-                //// (Use Delay) Allow the camera to take another picture in 10 seconds
-                //TimeSpan delay = TimeSpan.FromSeconds(10);
-
-                //ThreadPoolTimer DelayTimer = ThreadPoolTimer.CreateTimer(
-                //    (source) =>
-                //    {
-                //        _holdForTimer = false;
-
-                //    }, delay);
 
             }//end if ((faces.Count == 1) && !_holdForTimer && !_currentlyFiltered)
 

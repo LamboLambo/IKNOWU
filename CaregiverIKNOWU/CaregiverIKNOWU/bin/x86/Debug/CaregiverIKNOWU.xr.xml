@@ -60,7 +60,6 @@
     </RootType>
     <RootType FullName="Microsoft.Xaml.DirectUI.ProxyTypes.BindExtension">
       <RootProperty Name="Mode" />
-      <RootProperty Name="Converter" />
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.Viewbox">
       <RootProperty Name="HorizontalAlignment" />
@@ -74,6 +73,7 @@
     </RootType>
     <RootType FullName="Windows.UI.Xaml.Controls.AppBarButton">
       <RootProperty Name="Icon" />
+      <RootProperty Name="Visibility" />
       <RootProperty Name="Label" />
       <RootEvent Name="Tapped" />
     </RootType>

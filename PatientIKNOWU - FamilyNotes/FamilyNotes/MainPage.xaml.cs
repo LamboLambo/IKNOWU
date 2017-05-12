@@ -83,6 +83,8 @@ namespace FamilyNotes
         //ThreadPoolTimer checkSecondsTimer;
         //public static int t = 0;
         //public static bool isOnTime = false;
+        TimeSpan checkThisPhraseTimeSpan = TimeSpan.FromSeconds(3);
+        ThreadPoolTimer checkThisPhraseTimer;
 
 
 
@@ -124,6 +126,7 @@ namespace FamilyNotes
 
 
         }
+
 
         private async Task speech(string phrase)
         {
@@ -404,7 +407,7 @@ namespace FamilyNotes
             }
             else{
                 //This is a loaded stranger
-                thisPhrase = "This is a stranger!";
+                thisPhrase = "This is a stranger! Be careful!";
                 //listenAgainButtonName = "Stranger";
                 listenAgainButton.Content = "Stranger";
 
@@ -1094,7 +1097,7 @@ namespace FamilyNotes
         private async void startButton_Click(object sender, RoutedEventArgs e)
         {
             startButton.IsEnabled = false;
-
+            startButton.Content = "Please Wait...";
 
             //Perform initialization for facial detection.
             await FacialSimilarity.TrainDetectionAsync();
@@ -1109,26 +1112,43 @@ namespace FamilyNotes
             stopButton.Visibility = Visibility.Visible;
             startButton.Visibility = Visibility.Collapsed;
             startButton.IsEnabled = true;
-
+            startButton.Content = "Start";
 
             ////Set up the timer
-            //checkSecondsTimer = ThreadPoolTimer.CreatePeriodicTimer(async (source) =>
-            //{
-            //    t += 10;
+            checkThisPhraseTimer = ThreadPoolTimer.CreatePeriodicTimer(async (source) =>
+            {
+                checkVoiceFeedback();
 
-            //    isOnTime = true;
+                // Update the UI thread by using the UI core dispatcher.
+                await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
+                {
+                    if (thisPhrase.Contains("stranger"))
+                    {
+                        listenAgainButton.Content = "Stranger";
+                    }
 
-            //    // Update the UI thread by using the UI core dispatcher.
-            //    await Dispatcher.RunAsync(CoreDispatcherPriority.High, () =>
-            //    {
-            //        statusTextBlock.Text = t.ToString();
+                });
 
-            //    });
-
-            //}, checkSecondsTimeSpan);
+            }, checkThisPhraseTimeSpan);
 
 
         }
+
+        private async void checkVoiceFeedback()
+        {
+            if (thisPhrase.Contains("stranger1"))
+            {
+                //await speech("stranger!Sending the enquiry!");
+                //await _speechManager.SpeakAsync("stranger! Sending the enquiry!", _media);
+            }
+            else if (thisPhrase.Contains("stranger2"))
+            {
+                //await speech("Stranger! Be careful!");
+                //await _speechManager.SpeakAsync("Stranger! Be careful!", _media);
+            }
+
+        }
+
 
         public async void changeCameraState()
         {

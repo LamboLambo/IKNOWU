@@ -31,8 +31,9 @@ THE SOFTWARE.
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <CommandBar Visibility="Collapsed">
+        <CommandBar Background="#CCE6E6E6" Content=" I KNOW U for Patient &#xD;&#xA;     Name:     John">
             <CommandBar.PrimaryCommands>
+                
                 <AppBarButton x:Name="TestInternetConnection" Icon="World" Visibility="Collapsed"
                     Label="Test Internet Connection" Click="TestInternetConnection_Click"/>
                 <AppBarButton x:Name="Add" Icon="AddFriend" Label="New person"
@@ -150,9 +151,9 @@ THE SOFTWARE.
                 Margin="0,8,8,30"
                 NoteInputModeChanged="taskPanel_NoteInputModeChanged">
 
-                    <local:NotesPanel>
+                    <!--<local:NotesPanel>
                         <PerspectiveTransform3D></PerspectiveTransform3D>
-                    </local:NotesPanel>
+                    </local:NotesPanel>-->
                 </local:NotesPanel>
             </Grid>
 
@@ -413,13 +414,13 @@ THE SOFTWARE.
 
 
             <Button x:Name="startButton" Visibility="Visible"  Content="Start" HorizontalAlignment="Center"  Margin="10" VerticalAlignment="Center"  Click="startButton_Click" 
-                    Width="700" Height="400" Background="#FFD16868" Foreground="#FFEEEAEA" FontSize="100"/>
+                    Width="1000" Height="600" Background="#FFD16868" Foreground="#FFEEEAEA" FontSize="100"/>
 
             <Button x:Name="listenAgainButton" Visibility="Collapsed"  Content="Listen Again" HorizontalAlignment="Center"  Margin="10" VerticalAlignment="Center"  Click="listenAgainButton_Click" 
-                    Width="650" Height="400" Background="#FF68D197" Foreground="#FFEEEAEA" FontSize="100"/>
+                    Width="900" Height="600" Background="#FF68D197" Foreground="#FFEEEAEA" FontSize="100"/>
 
             <Button x:Name="stopButton" Visibility="Collapsed"   Content="Stop" HorizontalAlignment="Right"  Margin="0,0,10,60" VerticalAlignment="Bottom"  Click="stopButton_Click" 
-                    Width="170" Height="120" Background="#FFD16868" Foreground="#FFEEEAEA" FontSize="70"/>
+                    Width="200" Height="150" Background="#FFD16868" Foreground="#FFEEEAEA" FontSize="70"/>
 
             <TextBlock x:Name="CountBox" Text="{x:Bind _presence.FaceCount,Mode=OneWay}" TextWrapping="Wrap"
                     Visibility="Collapsed"   FontSize="50" Margin="10,10,10,0" TextAlignment="Center" Height="92" VerticalAlignment="Top" Foreground="#FFB6B6B6"/>

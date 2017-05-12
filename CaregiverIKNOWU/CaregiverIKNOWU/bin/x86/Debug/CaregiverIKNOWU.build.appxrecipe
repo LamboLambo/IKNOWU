@@ -483,6 +483,9 @@
       <PackagePath>Assets\Wide310x150Logo.scale-200.png</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\BlueBackground.jpg">
+      <PackagePath>Assets\BlueBackground.jpg</PackagePath>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Brushed_metal_texture.jpg">
       <PackagePath>Assets\Brushed_metal_texture.jpg</PackagePath>
     </AppxPackagedFile>

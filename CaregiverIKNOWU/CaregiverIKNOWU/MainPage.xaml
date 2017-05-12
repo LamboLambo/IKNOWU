@@ -37,11 +37,11 @@
     </Page.Resources>
 
     <Page.BottomAppBar>
-        <CommandBar Background="#CCE6E6E6" Content="Patient Name: &#xD;&#xA;     John">
+        <CommandBar Background="#CCE6E6E6" Content=" I KNOW U for Caregiver &#xD;&#xA;     Patient Name:     John">
             <CommandBar.PrimaryCommands>
                 <AppBarButton 
                     x:Name="Add"
-                    Icon="AddFriend"
+                    Icon="AddFriend" Visibility="Collapsed"
                     Label="Add New Patient"/>
                 <!--Tapped="AddPatientTapped"-->
 
@@ -65,7 +65,7 @@
 
                 <AppBarButton
                     x:Name="SettingsButton"
-                    Icon="Setting"
+                    Icon="Setting" Visibility="Collapsed"
                     Label="Settings" 
                     Tapped="SettingsButton_Tapped"/>
             </CommandBar.PrimaryCommands>
@@ -73,15 +73,14 @@
     </Page.BottomAppBar>
 
 
-    <Grid x:Name="rootGrid">
+    <Grid x:Name="rootGrid" >   <!--Background="#FFEDF18C"-->
         <Grid.Background>
-            <ImageBrush ImageSource="Assets/Brushed_metal_texture.jpg"/>
+            <ImageBrush ImageSource="Assets/BlueBackground.jpg"/>
         </Grid.Background>
         <Grid 
             x:Name="backgroundGrid"
             Width="Auto"
-            Height="Auto"
-            Background="{x:Bind AppSettings.WallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}" >
+            Height="Auto"><!--Background="{x:Bind AppSettings.WallPaper, Converter={StaticResource BitmapToBrushConverter}, Mode=OneWay}"-->
             <Grid.RowDefinitions>
                 <RowDefinition Height="140*"/>
                 <RowDefinition Height="351*"/>
@@ -105,7 +104,7 @@
                           ItemsSource="{x:Bind Persons}" 
                           ItemTemplate="{StaticResource PersonItemTemplate}" BorderBrush="#FF494949" BorderThickness="1,1,1,1"
                           ScrollViewer.HorizontalScrollBarVisibility="Auto" ScrollViewer.HorizontalScrollMode="Enabled"
-                          ScrollViewer.VerticalScrollBarVisibility="Disabled" ScrollViewer.VerticalScrollMode="Disabled"
+                          ScrollViewer.VerticalScrollBarVisibility="Auto" ScrollViewer.VerticalScrollMode="Enabled"
                           CanDragItems="False" 
                           IsItemClickEnabled="True" ItemClick="personGridView_ItemClick" SelectionChanged="personGridView_SelectionChanged"
                           >

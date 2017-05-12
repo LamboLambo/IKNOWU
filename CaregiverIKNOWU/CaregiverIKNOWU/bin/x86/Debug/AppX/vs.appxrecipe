@@ -28,13 +28,13 @@
     <AppXManifest Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-09T17:58:42.143</Modified>
+      <Modified>2017-05-09T19:47:07.394</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.exe">
       <PackagePath>entrypoint\CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-09T17:58:40.453</Modified>
+      <Modified>2017-05-09T19:47:04.307</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\.nuget\packages\Microsoft.Azure.Mobile.Client\3.1.0\lib\netcore45\Microsoft.WindowsAzure.Mobile.Ext.dll">
       <PackagePath>Microsoft.WindowsAzure.Mobile.Ext.dll</PackagePath>
@@ -645,6 +645,10 @@
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
       <Modified>2017-05-08T06:13:59.000</Modified>
     </AppxPackagedFile>
+    <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\BlueBackground.jpg">
+      <PackagePath>Assets\BlueBackground.jpg</PackagePath>
+      <Modified>2017-05-09T19:36:41.254</Modified>
+    </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\Assets\Brushed_metal_texture.jpg">
       <PackagePath>Assets\Brushed_metal_texture.jpg</PackagePath>
       <Modified>2017-04-26T12:56:47.493</Modified>
@@ -655,7 +659,7 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\CaregiverIKNOWU.xr.xml">
       <PackagePath>CaregiverIKNOWU.xr.xml</PackagePath>
-      <Modified>2017-05-09T17:58:40.032</Modified>
+      <Modified>2017-05-09T19:38:59.589</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Program Files %28x86%29\Windows Kits\10\UnionMetadata\Windows.winmd">
       <PackagePath>WinMetadata\Windows.winmd</PackagePath>
@@ -664,11 +668,11 @@
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2017-05-09T17:58:41.775</Modified>
+      <Modified>2017-05-09T19:47:06.943</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\LamboSAMA\Documents\GitHub\IKNOWU\CaregiverIKNOWU\CaregiverIKNOWU\bin\x86\Debug\Core\CaregiverIKNOWU.exe">
       <PackagePath>CaregiverIKNOWU.exe</PackagePath>
-      <Modified>2017-05-09T17:58:42.136</Modified>
+      <Modified>2017-05-09T19:47:07.381</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>
